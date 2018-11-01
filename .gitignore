@@ -2,3 +2,11 @@
 out/
 .idea/
 build/
+.DS_Store
+*.DS_Store
+.vscode
+.sass-cache
+package-lock.json
+yarn.lock
+.vscode/*
+node_modules/
