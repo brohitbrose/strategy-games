@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Niya</title>
+  <link href="style/main.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<script src="https://repo.swim.it/swim/recon-0.5.0.js"></script>
+<div>
+  <div class="container">
+    <div class="heading">
+      <h1 class="title">Niya</h1>
+      <a class="restart-button">New Game</a>
+    </div>
+
+    <div class="game-container">
+      <div class="game-message">
+        <p></p>
+        <div class="lower">
+          <a class="retry-button">Try again</a>
+        </div>
+      </div>
+
+      <div class="grid-container">
+        <div class="grid-row">
+          <div class="grid-cell" id="00" onclick="sendMove(socket,0,0)"></div>
+          <div class="grid-cell" id="01" onclick="sendMove(socket,0,1)"></div>
+          <div class="grid-cell" id="02" onclick="sendMove(socket,0,2)"></div>
+          <div class="grid-cell" id="03" onclick="sendMove(socket,0,3)"></div>
+        </div>
+        <div class="grid-row">
+          <div class="grid-cell" id="10" onclick="sendMove(socket,1,0)"></div>
+          <div class="grid-cell" id="11" onclick="sendMove(socket,1,1)"></div>
+          <div class="grid-cell" id="12" onclick="sendMove(socket,1,2)"></div>
+          <div class="grid-cell" id="13" onclick="sendMove(socket,1,3)"></div>
+        </div>
+        <div class="grid-row">
+          <div class="grid-cell" id="20" onclick="sendMove(socket,2,0)"></div>
+          <div class="grid-cell" id="21" onclick="sendMove(socket,2,1)"></div>
+          <div class="grid-cell" id="22" onclick="sendMove(socket,2,2)"></div>
+          <div class="grid-cell" id="23" onclick="sendMove(socket,2,3)"></div>
+        </div>
+        <div class="grid-row">
+          <div class="grid-cell" id="30" onclick="sendMove(socket,3,0)"></div>
+          <div class="grid-cell" id="31" onclick="sendMove(socket,3,1)"></div>
+          <div class="grid-cell" id="32" onclick="sendMove(socket,3,2)"></div>
+          <div class="grid-cell" id="33" onclick="sendMove(socket,3,3)"></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="game-explanation"><strong class="important">Rules</strong></p>
+    <ol class="game-explanation">
+      <li><strong>Red</strong> places a tile on the <strong>border</strong>.</li>
+      <li>Players alternate turns. Every <strong>subsequent move</strong> must have a <strong>common trait</strong> with its prior.</li>
+      <li>A color wins if
+        <ul>
+          <li>It owns a <strong>2x2 square</strong></li>
+          <li>It owns a <strong>row</strong>, <strong>column</strong>, or <strong>diagonal</strong></li>
+          <li>Its opponent can't move and <strong>empty spots exist</strong></li>
+        </ul></li>
+    </ol>
+  </div>  
+</div>
+<script>
+// Misc
+function idFromIndex(idx) {
+  return "" + Math.floor(idx / 4) + (idx % 4);
+}
+
+// Model definition used by view, controlled by socket
+function Game() { }
+Game.prototype.fromJson = function(deserialized) {
+  this.status = deserialized["@game"];
+  this.currentPlayer = deserialized["currentPlayer"];
+  this.winner = deserialized["winner"] || "NONE";
+  this.validMoves = deserialized["validMoves"];
+  this.board = deserialized["board"];
+  // Update view
+  view.drawGame();
+  if (this.status === "DONE") {
+    view.drawDone();
+  }
+};
+const game = new Game();
+
+// Websocket writes
+function sendInit(socket, mode1, mode2, state) {
+  const prefix = "@init{" + mode1 + "," + mode2;
+  if (state === undefined) {
+    socket.send(prefix + "}");
+  } else {
+    const tmp = JSON.stringify(state);
+    return prefix + ",{" + tmp.substring(1,tmp.length-1) + "}}";
+  }
+}
+function sendMove(socket, row, col) {
+  socket.send("@move{" + row + "," + col + "}");
+}
+
+
+// MAIN BEGINS HERE
+
+// HTML Actuator
+const view = {
+  status: null,
+  drawGame: function() {
+    // Draw tiles
+    // Would use for-in here, but it keeps flattening...
+    for (let i = 0; i < game.board.length; i++) {
+      const cell = document.getElementById(idFromIndex(i));
+      cell.className = "grid-cell";
+      switch (game.board[i][0]) {
+        case "RED":
+          cell.innerHTML = "<img src=img/red.svg>";
+          cell.classList.add("taken");
+          break;
+        case "BLACK":
+          cell.innerHTML = "<img src=img/black.svg>";
+          cell.classList.add("taken");
+          break;
+        case "NONE":
+          cell.innerHTML = '<img src=img/'+game.board[i][1]+'.svg>';
+          break;
+        default:
+          break; 
+      }
+    }
+    // Draw hints
+    if (game.validMoves) {
+      const additionalClass = game.currentPlayer.toLowerCase() + "-hint";
+      for (let i = 0; i < game.validMoves.length; i++) {
+        document.getElementById("" + game.validMoves[i]['$1'] + "" + game.validMoves[i]['$2']).classList.add(additionalClass);
+      }
+    }
+  },
+  drawDone: function() {
+    const messageContainer = document.querySelector(".game-message");
+    messageContainer.classList.add("done");
+    const msg = messageContainer.getElementsByTagName("p")[0];
+    if (game.winner === "NONE") {
+      msg.textContent = "A Tie!"
+    } else {
+      msg.textContent = (game.winner + " Wins!");
+    }
+  }
+};
+
+// Initialize socket
+const HOST = "ws://localhost:8887";
+const socket = new WebSocket(HOST);
+socket.onmessage = (event) => {
+  const deserialized = Recon.parse(event.data);
+  const state = deserialized['@game'];
+  // Update model
+  game.fromJson(deserialized);
+};
+
+// Buttons
+function bindButton(selector, fn) {
+  const button = document.querySelector(selector);
+  button.addEventListener("click", fn);
+}
+bindButton(".restart-button", () => sendInit(socket, "CLIENT", "SMART"));
+bindButton(".retry-button", () => {
+  const messageContainer = document.querySelector(".game-message");
+  messageContainer.classList.remove("done");
+  messageContainer.getElementsByTagName("p")[0].textContent = "";
+});
+</script>
+</body>
+</html>
