@@ -4,7 +4,7 @@ import ai.Minimaxable;
 import java.util.List;
 
 /**
- * {@link NiyaPlayer}that uses a minimax strategy to decide plays.
+ * {@link NiyaPlayer} that uses a minimax strategy to decide plays.
  */
 public class SmartPlayer implements NiyaPlayer {
 
@@ -53,10 +53,6 @@ final class View extends NiyaState implements Minimaxable<NiyaMove> {
     this.color = view.color;
   }
 
-  private boolean isTerminal() {
-    return this.winner() != Color.NONE || !this.hasRemaining();
-  }
-
   private int terminalValue() {
     final int val = 16 - this.movesMade() + 1;
     return this.winner() == Color.NONE ? 0 :
@@ -65,7 +61,7 @@ final class View extends NiyaState implements Minimaxable<NiyaMove> {
   }
 
   private int negamaxValue(int color, int alpha, int beta) {
-    if (this.isTerminal()) {
+    if (this.isOver()) {
       return color * terminalValue();
     }
     int bestSoFar = Integer.MIN_VALUE;
