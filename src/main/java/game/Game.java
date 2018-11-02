@@ -6,17 +6,17 @@ package game;
  * @param <S> the {@code State} type that manages this {@code Game}'s instances.
  * @param <M> the {@code Move} type that can be played in this {@code Game}.
  */
-public interface Game<S extends State<M>, M> {
+public interface Game<M> {
 
   /**
    * The {@code Player} who is expected to move on the current turn.
    */
-  Player<S, M> current();
+  Player<? extends State<M>, M> current();
 
   /**
    * Context used to manage the state of this {@code Game}.
    */
-  S state();
+  State<M> state();
 
   /**
    * Prompts {@code current()} to make a move.

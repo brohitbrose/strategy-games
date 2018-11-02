@@ -2,7 +2,7 @@ package game.niya;
 
 import game.Game;
 
-public final class Niya implements Game<NiyaState, NiyaMove> {
+public final class Niya implements Game<NiyaMove> {
 
   /**
    * The {@code Player} that moves on the first and every alternate turn.
