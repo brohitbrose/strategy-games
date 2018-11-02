@@ -1,9 +1,8 @@
 package game;
 
 /**
- * Manages the lifecycle of a game match.
+ * Entity that manages the lifecycle of a match.
  *
- * @param <S> the {@code State} type that manages this {@code Game}'s instances.
  * @param <M> the {@code Move} type that can be played in this {@code Game}.
  */
 public interface Game<M> {

@@ -2,6 +2,9 @@ package game.niya;
 
 import game.Game;
 
+/**
+ * {@link Game} that manages the lifecycle of a Niya match.
+ */
 public final class Niya implements Game<NiyaMove> {
 
   /**
@@ -20,13 +23,14 @@ public final class Niya implements Game<NiyaMove> {
   private NiyaState state;
 
   /**
-   * Co
+   * Initializes a {@code Niya} instance with {@code initialState}.
    *
    * @param red the {@code Player} who moves first
    * @param black the {@code Player} who moves second
    * @param initialState an array containing some permutation of the integers
    *                     0-15, inclusive.
-   * @throws IllegalArgumentException if
+   * @throws IllegalArgumentException if {@code initialState.length != 16} or
+   * {@code initialState} does not contain every integer from 0 to 15.
    */
   public Niya(NiyaPlayer red, NiyaPlayer black, int[] initialState) {
 
@@ -56,6 +60,9 @@ public final class Niya implements Game<NiyaMove> {
     state = new NiyaState(spots);
   }
 
+  /**
+   * Initializes a {@code Niya} instance with a randomized board configuration.
+   */
   public Niya(NiyaPlayer red, NiyaPlayer black) {
     this(red, black, randomInit());
   }

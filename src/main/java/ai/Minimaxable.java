@@ -1,8 +1,8 @@
 package ai;
 
 /**
- * A state that has a computable minimax value and is mutable via playing moves
- * of type {@code M}.
+ * Mutable state (but not necessarily a {@link game.State}) with a computable
+ * minimax value.
  */
 public interface Minimaxable<M> {
 

@@ -3,7 +3,7 @@ package game;
 import java.util.List;
 
 /**
- * An entity responsible for playing moves in a {@link Game}.
+ * Entity responsible for playing moves in a {@link Game}.
  *
  * @param <S> the {@link State} type in the {@code Game} that this
  *           {@code Player} is part of.

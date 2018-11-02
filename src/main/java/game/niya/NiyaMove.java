@@ -4,6 +4,9 @@ import recon.Form;
 import recon.Record;
 import recon.Value;
 
+/**
+ * Straightforward wrapper class for a desired play's row and column indices.
+ */
 public class NiyaMove {
 
   int row;
