@@ -34,9 +34,9 @@ public class SmartPlayer implements NiyaPlayer {
       if (nv > bestValue) {
         bestValue = nv;
         bestChoice = choice;
+        alpha = bestValue;
         // Note that alpha will never match or exceed beta from the top level,
         // so we skip any fast-fail checks here.
-        alpha = Math.max(bestValue, alpha);
       }
     }
     return bestChoice;
@@ -103,9 +103,14 @@ final class View extends NiyaState implements Minimaxable<NiyaMove> {
     int bestSoFar = Integer.MIN_VALUE;
     for (NiyaMove choice: this.validMoves()) {
       final View updatedState = new View(this, choice);
-      bestSoFar = Math.max(-updatedState.negamaxValue(-color), bestSoFar);
-      alpha = Math.max(alpha, bestSoFar);
-      if (alpha >= beta) break;
+      final int newValue = -updatedState.negamaxValue(-color);
+      if (newValue > bestSoFar) {
+        bestSoFar = newValue;
+        if (bestSoFar > alpha) {
+          alpha = bestSoFar;
+          if (alpha >= beta) break;
+        }
+      }
     }
     return bestSoFar;
   }
