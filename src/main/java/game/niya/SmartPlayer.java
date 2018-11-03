@@ -26,14 +26,17 @@ public class SmartPlayer implements NiyaPlayer {
   public NiyaMove decide(NiyaState trueState, List<NiyaMove> possible) {
     int bestValue = Integer.MIN_VALUE;
     NiyaMove bestChoice = null;
-    // Could prune here, too. May tackle in future.
-    for (NiyaMove choice: possible) {
-      final View updatedState = new View(trueState, this.color);
-      updatedState.move(choice);
+    int alpha = -100;
+    int beta = 100;
+    for (NiyaMove choice : possible) {
+      final View updatedState = new View(trueState, this.color, alpha, beta, choice);
       final int nv = -updatedState.minimaxValue();
       if (nv > bestValue) {
         bestValue = nv;
         bestChoice = choice;
+        // Note that alpha will never match or exceed beta from the top level,
+        // so we skip any fast-fail checks here.
+        alpha = Math.max(bestValue, alpha);
       }
     }
     return bestChoice;
@@ -57,15 +60,33 @@ public class SmartPlayer implements NiyaPlayer {
 final class View extends NiyaState implements Minimaxable<NiyaMove> {
 
   private final Color color;
+  private int alpha;
+  private int beta;
 
-  View(NiyaState state, Color color) {
+  /**
+   * Constructs a new {@code View} that is the result of playing {@code m} in
+   * {@code state}, assuming that {@code state} was bound by {@code alpha} and
+   * {@code beta}, and updates {@code this.alpha} and {@code this.beta}
+   * accordingly.
+   */
+  View(NiyaState state, Color color, int alpha, int beta, NiyaMove m) {
     super(state);
     this.color = color;
+    this.alpha = -beta;
+    this.beta = -alpha;
+    makeMove(m);
   }
 
-  View (View view) {
+  /**
+   * Constructs a new {@code View} that is the result of playing {@code m} in
+   * {@code view}, updating {@code alpha} and {@code beta} accordingly.
+   */
+  View(View view, NiyaMove m) {
     super(view);
     this.color = view.color;
+    this.alpha = -view.beta;
+    this.beta = -view.alpha;
+    makeMove(m);
   }
 
   private int terminalValue() {
@@ -75,17 +96,14 @@ final class View extends NiyaState implements Minimaxable<NiyaMove> {
         val : -val;
   }
 
-  private int negamaxValue(int color, int alpha, int beta) {
+  private int negamaxValue(int color) {
     if (this.isOver()) {
       return color * terminalValue();
     }
     int bestSoFar = Integer.MIN_VALUE;
     for (NiyaMove choice: this.validMoves()) {
-      final View updatedState = new View(this);
-      updatedState.move(choice);
-      // Pruning proves crucial, changing the computation time for the first
-      // move in a game from around 90 seconds to 1.5 seconds.
-      bestSoFar = Math.max(-updatedState.negamaxValue(-color, -beta, -alpha), bestSoFar);
+      final View updatedState = new View(this, choice);
+      bestSoFar = Math.max(-updatedState.negamaxValue(-color), bestSoFar);
       alpha = Math.max(alpha, bestSoFar);
       if (alpha >= beta) break;
     }
@@ -94,9 +112,7 @@ final class View extends NiyaState implements Minimaxable<NiyaMove> {
 
   @Override
   public int minimaxValue() {
-    final int alpha = -100;
-    final int beta = 100;
-    return negamaxValue(-1, -beta, -alpha);
+    return negamaxValue(-1);
   }
 
   @Override
