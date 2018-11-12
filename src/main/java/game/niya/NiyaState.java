@@ -87,7 +87,7 @@ public class NiyaState implements State<NiyaMove> {
     }
     board = initialState;
     // The number of valid moves will never exceed 10
-    validMoves = new ArrayList<>(10);
+    validMoves = new ArrayList<>(12);
     updateValidMoves();
   }
 
@@ -102,7 +102,7 @@ public class NiyaState implements State<NiyaMove> {
     previous = s.previous;
     movesMade = s.movesMade;
     winner = s.winner;
-    List<NiyaMove> moves = new ArrayList<>(10);
+    List<NiyaMove> moves = new ArrayList<>(12);
     for (NiyaMove m: s.validMoves) {
       moves.add(new NiyaMove(m));
     }
