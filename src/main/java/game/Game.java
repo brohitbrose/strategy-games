@@ -10,7 +10,7 @@ public interface Game<M> {
   /**
    * The {@code Player} who is expected to move on the current turn.
    */
-  Player<? extends State<M>, M> current();
+  Player<M> current();
 
   /**
    * Context used to manage the state of this {@code Game}.

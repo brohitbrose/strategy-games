@@ -91,6 +91,14 @@ public class NiyaState implements State<NiyaMove> {
     updateValidMoves();
   }
 
+
+  /**
+   * Copy constructor.
+   */
+  public NiyaState(State<NiyaMove> s) {
+    this((NiyaState) s);
+  }
+
   /**
    * Copy constructor.
    */

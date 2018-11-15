@@ -1,5 +1,6 @@
 package game.niya;
 
+import game.State;
 import java.util.List;
 import java.util.Scanner;
 
@@ -16,7 +17,7 @@ public class KeyboardPlayer implements NiyaPlayer {
   }
 
   @Override
-  public NiyaMove decide(NiyaState s, List<NiyaMove> possible) {
+  public NiyaMove decide(State<NiyaMove> s, List<NiyaMove> possible) {
     return new NiyaMove(keyboard.nextInt(), keyboard.nextInt());
   }
 }
