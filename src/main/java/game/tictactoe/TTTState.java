@@ -60,14 +60,17 @@ public class TTTState implements State<Integer> {
     boolean x = (movesMade & 1) == 0;
     Piece p;
     int[] cache;
+    int offset;
     if (x) {
       p = Piece.X;
       cache = xMarks;
+      offset = 1;
     } else {
       p = Piece.O;
       cache = oMarks;
+      offset = 0;
     }
-    board = board | (1 << (m * 2 + (x ? 1 : 0)));
+    board = board | (1 << (m * 2 + offset));
     movesMade++;
     validMoves.remove(m);
     cache[m/3] += 1;
@@ -118,5 +121,3 @@ public class TTTState implements State<Integer> {
     System.out.println("-------");
   }
 }
-
-enum Piece { X, O, NONE }
