@@ -7,12 +7,32 @@ import game.State;
  */
 public interface Negamaxable<M> extends Minimaxable<M>, State<M> {
 
+  /**
+   * The lower bound of possible negamax values that this {@code Negamaxable}
+   * can take on.
+   */
   int alpha();
+
+  /**
+   * Assigns {@code alpha} to {@link #alpha()}.
+   */
   void alpha(int alpha);
 
+  /**
+   * The upper bound of possible negamax values that this {@code Negamaxable}
+   * can take on.
+   */
   int beta();
+
+  /**
+   * Assigns {@code beta} to {@link #beta()}.
+   */
   void beta(int beta);
 
+  /**
+   * Returns a new {@code Negamaxable} that captures the result of playing
+   * {@code m} to {@code this} (but leaves {@code this} untouched).
+   */
   Negamaxable<M> cloneAndMove(M m);
 
   int terminalValue();

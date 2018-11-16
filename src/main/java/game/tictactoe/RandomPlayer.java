@@ -3,6 +3,9 @@ package game.tictactoe;
 import game.State;
 import java.util.List;
 
+/**
+ * {@link TTTPlayer} that chooses a move from {@code possible} at random.
+ */
 public class RandomPlayer implements TTTPlayer {
 
   @Override

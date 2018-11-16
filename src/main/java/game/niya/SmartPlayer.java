@@ -46,7 +46,7 @@ public class SmartPlayer implements NiyaPlayer {
 }
 
 /**
- * {@link Minimaxable} extension of {@link NiyaState}.
+ * {@link Negamaxable} extension of {@link NiyaState}.
  * <p>
  * Although some versions of Niya do not consider empty tiles remaining at the
  * end of a match, we want the AI to win in as few moves as possible.  Thus, the

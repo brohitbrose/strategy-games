@@ -4,6 +4,9 @@ import ai.Negamaxable;
 import game.State;
 import java.util.List;
 
+/**
+ * {@link TTTPlayer} that uses a minimax strategy to decide plays.
+ */
 public class SmartPlayer implements TTTPlayer {
 
   private final Piece piece;
@@ -34,12 +37,21 @@ public class SmartPlayer implements TTTPlayer {
   }
 }
 
+/**
+ * {@link Negamaxable} extension of {@link TTTState}.
+ */
 final class View extends TTTState implements Negamaxable<Integer> {
 
   private int alpha;
   private int beta;
   private final Piece color;
 
+  /**
+   * Constructs a new {@code View} that is the result of playing {@code m} in
+   * {@code state}, assuming that {@code state} was bound by {@code alpha} and
+   * {@code beta}, and updates {@code this.alpha} and {@code this.beta}
+   * accordingly.
+   */
   View(State<Integer> state, Piece color, int alpha, int beta, int m) {
     super(state);
     this.color = color;
@@ -48,6 +60,10 @@ final class View extends TTTState implements Negamaxable<Integer> {
     makeMove(m);
   }
 
+  /**
+   * Constructs a new {@code View} that is the result of playing {@code m} in
+   * {@code view}, updating {@code alpha} and {@code beta} accordingly.
+   */
   View(View view, int m) {
     super(view);
     this.color = view.color;

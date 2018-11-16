@@ -86,7 +86,7 @@ class NiyaState implements State<NiyaMove> {
       board[i].color = Color.NONE;
     }
     board = initialState;
-    // The number of valid moves will never exceed 10
+    // The number of valid moves will never exceed 12
     validMoves = new ArrayList<>(12);
     updateValidMoves();
   }
