@@ -70,20 +70,20 @@ public class TTTState implements State<Integer> {
     board = board | (1 << (m * 2 + (x ? 1 : 0)));
     movesMade++;
     validMoves.remove(m);
-
     cache[m/3] += 1;
     cache[(m%3) + 3] += 1;
+    int maxSoFar = Math.max(cache[m/3], cache[(m%3)+3]);
     if (m == 0 || m == 4 || m == 8) {
       cache[6] += 1;
+      maxSoFar = Math.max(maxSoFar, cache[6]);
     }
     if (m == 2 || m == 4 || m == 6) {
       cache[7] += 1;
+      maxSoFar = Math.max(maxSoFar, cache[7]);
     }
-    for (int i : cache) {
-      if (i == 3) {
-        winner = p;
-        validMoves.clear();
-      }
+    if (maxSoFar >= 3) {
+      winner = p;
+      validMoves.clear();
     }
     return true;
   }
