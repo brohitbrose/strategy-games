@@ -4,22 +4,33 @@ import game.Game;
 import game.Player;
 import game.State;
 
+/**
+ * {@link Game} that manages the lifecycle of a Tic-tac-toe match.
+ */
 public final class TicTacToe implements Game<Integer> {
 
+  /**
+   * The {@code Player} that moves on the first and every alternate turn.
+   */
   private final TTTPlayer x;
+
+  /**
+   * The {@code Player} that moves on the second and every alternate turn.
+   */
   private final TTTPlayer o;
+
+  /**
+   * Internal {@link TTTState}.
+   */
   private final TTTState state;
 
+  /**
+   * Initializes a blank {@code TicTacToe} instance.
+   */
   public TicTacToe(TTTPlayer x, TTTPlayer o) {
     this.x = x;
     this.o = o;
     this.state = new TTTState();
-  }
-
-  public TicTacToe(TicTacToe t) {
-    this.x = t.x;
-    this.o = t.o;
-    this.state = t.state;
   }
 
   @Override

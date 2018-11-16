@@ -37,7 +37,8 @@ public interface Game<M> {
   void start();
 
   /**
-   * Plays {@code m} and updates {@code state()} accordingly.
+   * Plays {@code m} and updates {@code state()} accordingly, then {@code
+   * await()}s the appropriate player if the game hasn't finished.
    */
   default void playMove(M m) {
     if (state().makeMove(m)) {
