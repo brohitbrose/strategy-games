@@ -5,14 +5,12 @@ import java.util.List;
 /**
  * Entity responsible for playing moves in a {@link Game}.
  *
- * @param <S> the {@link State} type in the {@code Game} that this
- *           {@code Player} is part of.
  * @param <M> the type of {@code Move} that this {@code Player} plays.
  */
-public interface Player<S extends State<M>, M> {
+public interface Player<M> {
 
   /**
    * Returns a move from {@code possible} after considering {@code state}.
    */
-  M decide(S state, List<M> possible);
+  M decide(State<M> state, List<M> possible);
 }

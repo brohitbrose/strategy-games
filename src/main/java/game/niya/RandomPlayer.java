@@ -1,5 +1,6 @@
 package game.niya;
 
+import game.State;
 import java.util.List;
 
 /**
@@ -8,7 +9,7 @@ import java.util.List;
 public final class RandomPlayer implements NiyaPlayer {
 
   @Override
-  public NiyaMove decide(NiyaState s, List<NiyaMove> possible) {
+  public NiyaMove decide(State<NiyaMove> s, List<NiyaMove> possible) {
     return possible.get((int) (Math.random() * possible.size()));
   }
 }

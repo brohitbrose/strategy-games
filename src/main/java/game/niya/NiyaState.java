@@ -16,7 +16,7 @@ import recon.Value;
  * NiyaState} instance is initialized, mutability of its fields is only offered
  * via calls to either {@link #makeMove(NiyaMove)} or {@link #reset()}.
  */
-public class NiyaState implements State<NiyaMove> {
+class NiyaState implements State<NiyaMove> {
 
   /**
    * A 1D array of {@link Spot Spots} that represents the 2D grid.  {@code
@@ -86,9 +86,17 @@ public class NiyaState implements State<NiyaMove> {
       board[i].color = Color.NONE;
     }
     board = initialState;
-    // The number of valid moves will never exceed 10
+    // The number of valid moves will never exceed 12
     validMoves = new ArrayList<>(12);
     updateValidMoves();
+  }
+
+
+  /**
+   * Copy constructor.
+   */
+  public NiyaState(State<NiyaMove> s) {
+    this((NiyaState) s);
   }
 
   /**

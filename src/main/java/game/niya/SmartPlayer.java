@@ -1,6 +1,8 @@
 package game.niya;
 
 import ai.Minimaxable;
+import ai.Negamaxable;
+import game.State;
 import java.util.List;
 
 /**
@@ -23,7 +25,7 @@ public class SmartPlayer implements NiyaPlayer {
   }
 
   @Override
-  public NiyaMove decide(NiyaState trueState, List<NiyaMove> possible) {
+  public NiyaMove decide(State<NiyaMove> trueState, List<NiyaMove> possible) {
     int bestValue = Integer.MIN_VALUE;
     NiyaMove bestChoice = null;
     int alpha = -100;
@@ -44,7 +46,7 @@ public class SmartPlayer implements NiyaPlayer {
 }
 
 /**
- * {@link Minimaxable} extension of {@link NiyaState}.
+ * {@link Negamaxable} extension of {@link NiyaState}.
  * <p>
  * Although some versions of Niya do not consider empty tiles remaining at the
  * end of a match, we want the AI to win in as few moves as possible.  Thus, the
@@ -57,11 +59,11 @@ public class SmartPlayer implements NiyaPlayer {
  * Because Niya can be safely treated as a zero-sum game, the board value for
  * one player is simply the negation of the value for the other.
  */
-final class View extends NiyaState implements Minimaxable<NiyaMove> {
+final class View extends NiyaState implements Negamaxable<NiyaMove> {
 
-  private final Color color;
   private int alpha;
   private int beta;
+  private final Color color;
 
   /**
    * Constructs a new {@code View} that is the result of playing {@code m} in
@@ -69,7 +71,7 @@ final class View extends NiyaState implements Minimaxable<NiyaMove> {
    * {@code beta}, and updates {@code this.alpha} and {@code this.beta}
    * accordingly.
    */
-  View(NiyaState state, Color color, int alpha, int beta, NiyaMove m) {
+  View(State<NiyaMove> state, Color color, int alpha, int beta, NiyaMove m) {
     super(state);
     this.color = color;
     this.alpha = -beta;
@@ -81,7 +83,7 @@ final class View extends NiyaState implements Minimaxable<NiyaMove> {
    * Constructs a new {@code View} that is the result of playing {@code m} in
    * {@code view}, updating {@code alpha} and {@code beta} accordingly.
    */
-  View(View view, NiyaMove m) {
+  private View(View view, NiyaMove m) {
     super(view);
     this.color = view.color;
     this.alpha = -view.beta;
@@ -89,30 +91,37 @@ final class View extends NiyaState implements Minimaxable<NiyaMove> {
     makeMove(m);
   }
 
-  private int terminalValue() {
+  @Override
+  public int alpha() {
+    return alpha;
+  }
+
+  @Override
+  public void alpha(int alpha) {
+    this.alpha = alpha;
+  }
+
+  @Override
+  public int beta() {
+    return beta;
+  }
+
+  @Override
+  public void beta(int beta) {
+    this.beta = beta;
+  }  
+
+  @Override
+  public Negamaxable<NiyaMove> cloneAndMove(NiyaMove m) {
+    return new View(this, m);
+  }
+
+  @Override
+  public int terminalValue() {
     final int val = 16 - this.movesMade() + 1;
     return this.winner() == Color.NONE ? 0 :
       this.winner() == color ?
         val : -val;
-  }
-
-  private int negamaxValue(int color) {
-    if (this.isOver()) {
-      return color * terminalValue();
-    }
-    int bestSoFar = Integer.MIN_VALUE;
-    for (NiyaMove choice: this.validMoves()) {
-      final View updatedState = new View(this, choice);
-      final int newValue = -updatedState.negamaxValue(-color);
-      if (newValue > bestSoFar) {
-        bestSoFar = newValue;
-        if (bestSoFar > alpha) {
-          alpha = bestSoFar;
-          if (alpha >= beta) break;
-        }
-      }
-    }
-    return bestSoFar;
   }
 
   @Override
