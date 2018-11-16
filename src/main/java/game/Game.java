@@ -18,9 +18,18 @@ public interface Game<M> {
   State<M> state();
 
   /**
+   * Copy of context used to manage the state of this {@code Game}.
+   */
+  State<M> snapshot();
+
+  /**
    * Prompts {@code current()} to make a move.
    */
-  void await();
+  default void await() {
+    final State<M> copy = snapshot();
+    System.out.println("Possible: " + copy.validMoves());
+    playMove(current().decide(copy, copy.validMoves()));
+  }
 
   /**
    * Starts this {@code Game}.
@@ -30,7 +39,7 @@ public interface Game<M> {
   /**
    * Plays {@code m} and updates {@code state()} accordingly.
    */
-  default void makeMove(M m) {
+  default void playMove(M m) {
     if (state().makeMove(m)) {
       state().debug();
       if (!state().isOver()) {

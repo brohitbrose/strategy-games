@@ -10,17 +10,17 @@ public final class Niya implements Game<NiyaMove> {
   /**
    * The {@code Player} that moves on the first and every alternate turn.
    */
-  private NiyaPlayer red;
+  private final NiyaPlayer red;
 
   /**
    * The {@code Player} that moves on the second and every alternate turn.
    */
-  private NiyaPlayer black;
+  private final NiyaPlayer black;
 
   /**
    * Internal {@link NiyaState}.
    */
-  private NiyaState state;
+  private final NiyaState state;
 
   /**
    * Initializes a {@code Niya} instance with {@code initialState}.
@@ -92,6 +92,11 @@ public final class Niya implements Game<NiyaMove> {
   }
 
   @Override
+  public NiyaState snapshot() {
+    return new NiyaState(this.state);
+  }
+
+  @Override
   public void start() {
     state.displayTiles();
     await();
@@ -99,8 +104,8 @@ public final class Niya implements Game<NiyaMove> {
 
   @Override
   public void await() {
-    System.out.println("Possible: " + state.validMoves());
-    final NiyaState copy = state();
-    makeMove(current().decide(copy, copy.validMoves()));
+    final NiyaState copy = snapshot();
+    System.out.println("Possible: " + copy.validMoves());
+    playMove(current().decide(copy, copy.validMoves()));
   }
 }

@@ -61,8 +61,8 @@ public class SmartPlayer implements NiyaPlayer {
  */
 final class View extends NiyaState implements Negamaxable<NiyaMove> {
 
-  protected int alpha;
-  protected int beta;
+  private int alpha;
+  private int beta;
   private final Color color;
 
   /**
@@ -83,7 +83,7 @@ final class View extends NiyaState implements Negamaxable<NiyaMove> {
    * Constructs a new {@code View} that is the result of playing {@code m} in
    * {@code view}, updating {@code alpha} and {@code beta} accordingly.
    */
-  View(View view, NiyaMove m) {
+  private View(View view, NiyaMove m) {
     super(view);
     this.color = view.color;
     this.alpha = -view.beta;

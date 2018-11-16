@@ -1,10 +1,9 @@
 package ai;
 
-import game.Game;
 import game.State;
 
 /**
- * Mutable {@link game.State} with a computable negamax value.
+ * Mutable {@link State} with a computable negamax value.
  */
 public interface Negamaxable<M> extends Minimaxable<M>, State<M> {
 
@@ -19,7 +18,7 @@ public interface Negamaxable<M> extends Minimaxable<M>, State<M> {
   int terminalValue();
 
   /**
-   * The negamax value of this state, with a default alpha-beta pruning
+   * The negamax value of this {@link State}, with a default alpha-beta pruning
    * implementation.
    */
   default int negamaxValue(int color) {

@@ -16,7 +16,7 @@ import recon.Value;
  * NiyaState} instance is initialized, mutability of its fields is only offered
  * via calls to either {@link #makeMove(NiyaMove)} or {@link #reset()}.
  */
-public class NiyaState implements State<NiyaMove> {
+class NiyaState implements State<NiyaMove> {
 
   /**
    * A 1D array of {@link Spot Spots} that represents the 2D grid.  {@code

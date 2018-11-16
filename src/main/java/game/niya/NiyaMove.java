@@ -7,7 +7,7 @@ import recon.Value;
 /**
  * Straightforward wrapper class for a desired play's row and column indices.
  */
-public class NiyaMove {
+class NiyaMove {
 
   int row;
   int col;
