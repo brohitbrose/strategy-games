@@ -62,9 +62,6 @@ class NiyaState implements State<NiyaMove> {
    */
   public Color winner() { return winner; }
 
-  /**
-   * The number of moves that have been played so far.
-   */
   public int movesMade() { return movesMade; }
 
   /**
