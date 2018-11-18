@@ -83,18 +83,25 @@ class TTTState implements State<Integer> {
     return validMoves;
   }
 
+  /**
+   * Returns the two bits of {@code cacheCopy} that are {@code filter} pairs
+   * from the right.
+   */
   private static int extract(int cacheCopy, int filter) {
     return ((cacheCopy & (3 << filter)) >>> filter);
   }
 
+  /**
+   * Returns 3 if either {@code val} or {@code foundThree} is 3, 1 otherwise.
+   */
   private static int collapse(int val, int foundThree) {
-    return (((val >>> 1) & val) | ((foundThree >>> 1) & foundThree)) * 3;
+    return ((((val >>> 1) & val) | ((foundThree >>> 1) & foundThree)) << 1) | 1;
   }
 
   @Override
   public boolean makeMove(Integer m) {
     if (isOver() || // can't make move if game is over...
-        ((3 << (m * 2)) & board) != 0) { // ...or position is already occupied
+        ((3 << (m << 1)) & board) != 0) { // ...or position is already occupied
       return false;
     }
     boolean x = (movesMade & 1) == 0; // true if X is current player
@@ -113,33 +120,34 @@ class TTTState implements State<Integer> {
       boardOffset = 0;
       cacheCopy = (cache >>> 16);
     }
-    board |= (1 << (m * 2 + boardOffset)); // make move
+    board |= (1 << ((m << 1) + boardOffset)); // make move
     movesMade++;
     validMoves.remove(m);
 
     // relevant horizontal
-    int filter = (m/3) * 2;
+    int filter = (m / 3) << 1;
     cacheCopy += (1 << filter);
-    int foundThree = extract(cacheCopy, filter); // 0, 1, 2, 3
+    int foundThree = extract(cacheCopy, filter); // possible 0, 1, 2, 3
     // relevant vertical
-    filter = ((m%3)+3) * 2;
+    filter = ((m % 3) + 3) << 1;
     cacheCopy += (1 << filter);
     int val = extract(cacheCopy, filter);
-    foundThree = collapse(val, foundThree); // 0, 3
+    foundThree = collapse(val, foundThree); // possible 1, 3
     // diagonal that slopes down
-    if (m == 0 || m == 4 || m == 8) {
+    if ((m & 3) == 0) {
       filter = 12;
       cacheCopy += (1 << filter);
       val = extract(cacheCopy, filter);
-      foundThree = collapse(val, foundThree); // 0, 3
+      foundThree = collapse(val, foundThree); // possible 1, 3
     }
     // diagonal that slopes up
     if (m == 2 || m == 4 || m == 6) {
       filter = 14;
       cacheCopy += (1 << filter);
       val = extract(cacheCopy, filter);
-      foundThree = collapse(val, foundThree); // 0, 3
+      foundThree = collapse(val, foundThree); // possible 1, 3
     }
+    // update cache
     cache = (cacheCopy << offset) | (cache & (0xFFFF << (16 - offset)));
     if (foundThree == 3) {
       winner = p;
