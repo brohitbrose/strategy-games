@@ -28,7 +28,7 @@ import java.util.List;
  * bottom), respectively.  So, for example, a {@code cache} value of {@code
  * 001,010,001,010,100,010,001,010,001;010,010;000,010,010,000;000,010,010,000}
  * (commas distinguish specifics within a "type" like square or vertical,
- * semicolons distinguish a new type) indicates exactly
+ * semicolons indicate new types) indicates exactly
  * <p><ul>
  * <li>0 spots filled for each "outer" horizontal and vertical
  * <li>1 spot filled for each "corner" 2x2 square
