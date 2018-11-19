@@ -17,45 +17,46 @@ import java.util.List;
  * Some nontrivial hackery is used to quickly determine if a win condition has
  * been met.  The basic idea is that every time we mark a spot, we can increment
  * running counts for every row, column, diagonal, or square that contains this
- * spot, and the game is over as soon as any of these counts hits 4.  Instead
- * of explicitly using collections, we harness fact that storing 4 requires only
- * three bits, and with 19 unique win conditions (4 horizontals, 4 verticals, 2
- * diagonals, 9 squares), we only need 57 bits.  Thus, a 64-bit {@code long} is
- * plenty, and we keep one per color ({@code redCache} and {@code blackCache}).
- * Each triple of bits, starting from the right, represents each row from top to
- * bottom, each vertical from left to right, the downward diagonal, the upward
- * diagonal, and each 2x2 square (left to right within each row from top to
- * bottom), respectively.  So, for example, a {@code cache} value of {@code
- * 001,010,001,010,100,010,001,010,001;010,010;000,010,010,000;000,010,010,000}
- * (commas distinguish specifics within a "type" like square or vertical,
- * semicolons indicate new types) indicates exactly
+ * spot, and the game is over as soon as any of these counts hits 4.  To model
+ * this without collections, we reap the fact that storing 0 through 4 only
+ * requires three bits, and with 19 unique win conditions (4 horizontals, 4
+ * verticals, 2 diagonals, 9 squares), we only need 57 bits.  A 64-bit {@code
+ * long} per color is plenty, hence {@code redCache} and {@code blackCache}.
+ * <p>
+ * For each 64-bit {@code cache}, each triple of bits, starting from the right,
+ * represents
  * <p><ul>
- * <li>0 spots filled for each "outer" horizontal and vertical
- * <li>1 spot filled for each "corner" 2x2 square
- * <li>2 spots filled for each "inner" horizontal, "inner" vertical, and the
- * top- and bottom-middle 2x2 squares
- * <li>3 spots filled nowhere on the board
+ * <li>each of four rows, from top to bottom
+ * <li>each of four columns, from left to right
+ * <li>the downward diagonal
+ * <li>the upward diagonal
  * <li>4 spots filled in the middle 2x2 square
  * </ul>
  * <p>
- * You may correctly deduce this to mean that the middle 2x2 square has been
- * filled out.
+ * respectively. So, for example, a {@code cache} value of {@code
+ * 001,010,001,001,010,001,001,001,010;001,011;001,001,010,001;001,001,001,010}
+ * indicates that exactly
+ * <p><ul>
+ * <li>1 spot was filled in each row but the top; each column but the second
+ * (from the left); the upward diagonal; and the top-center, middle-left,
+ * middle-right, bottom-left, and bottom-right 2x2 squares
+ * <li>2 spots were filled in the top row, the second column, and all other
+ * 2x2 squares
+ * <li>3 spots were filled in the downward diagonal.
+ * </ul>
  * <p>
- * Initially, {@code cache} is {@code 0}.  Whenever a piece is placed, the right
- * bit triples in {@code cache} must be incremented by 1.  If we knew exactly
- * which triples to increment for a given move, we could achieve this in
- * "parallel" by simply adding the right number (whose binary representation has
- * every triple, leading zeros excluded, take the form of either {@code 000} or
- * {@code 001}) to {@code cache}.  Luckily, these numbers <em>are</em>
- * statically known and are stored in {@code INCREMENTS}.
+ * Initially, {@code cache} is {@code 0}.  Whenever a piece is placed, the
+ * correct bit triples in {@code cache} must be incremented by 1.  Since we know
+ * exactly which triples to increment for a given move, we can achieve this
+ * easily by adding the correct magic number (really just a {@code long} whose
+ * binary representation contains the sequence {@code 001} in the right places)
+ * to {@code cache}. Because 4 is conveniently a power of 2 and we enforce that
+ * none of our bit triples exceeds 4 in value, checking for a win is as simple
+ * as masking {@code cache} against {@code 0000000100100100...100100} and
+ * receiving a nonzero result.
  */
 class NiyaState implements State<NiyaMove> {
 
-  /**
-   * A 1D array of {@link Spot Spots} that represents the 2D grid.  {@code
-   * board} index {@code idx} maps to the (zero-indexed) grid row {@code idx /
-   * 4} and grid column {@code idx % 4}.
-   */
   private Spot[] board; // match state
   private Spot previous; // (possibly null) Spot selected in previous turn
   private int movesMade; // moves made so far
@@ -155,14 +156,6 @@ class NiyaState implements State<NiyaMove> {
   }
 
   /**
-   * Expands {@code index} into its row and column components.  Assumes {@code
-   * index} is in the range 0..=15.
-   */
-  private static NiyaMove expand(int index) {
-    return new NiyaMove(index >> 2, index & 3);
-  }
-
-  /**
    * Returns the {@code Spot} at grid position ({@code m.row}, {@code m.col}).
    */
   public Spot getSpot(NiyaMove m) {
@@ -233,7 +226,7 @@ class NiyaState implements State<NiyaMove> {
     }
   }
 
-  public boolean hasRemaining() {
+  private boolean hasRemaining() {
     return movesMade < 16;
   }
 
