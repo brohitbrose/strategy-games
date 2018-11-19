@@ -28,9 +28,8 @@ import java.util.List;
  * <p><ul>
  * <li>each of four rows, from top to bottom
  * <li>each of four columns, from left to right
- * <li>the downward diagonal
- * <li>the upward diagonal
- * <li>4 spots filled in the middle 2x2 square
+ * <li>the downward diagonal, then the upward diagonal
+ * <li>each 2x2 square, left to right within each row starting from the top
  * </ul>
  * <p>
  * respectively. So, for example, a {@code cache} value of {@code
