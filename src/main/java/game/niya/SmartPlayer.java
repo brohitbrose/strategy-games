@@ -1,6 +1,5 @@
 package game.niya;
 
-import ai.Minimaxable;
 import ai.Negamaxable;
 import game.State;
 import java.util.List;

@@ -2,19 +2,52 @@ package game.niya;
 
 import game.State;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import recon.Record;
-import recon.Value;
 
 /**
  * Internal class that manages the state of a Niya game instance.  Once a {@code
  * NiyaState} instance is initialized, mutability of its fields is only offered
  * via calls to either {@link #makeMove(NiyaMove)} or {@link #reset()}.
+ * <p>
+ * A 1D array of {@link Spot Spots}, {@code board}, represents the 2D grid.
+ * {@code board} index {@code idx} maps to the (zero-indexed) grid row {@code
+ * idx / 4} and grid column {@code idx % 4}.
+ * <p>
+ * Some nontrivial hackery is used to quickly determine if a win condition has
+ * been met.  The basic idea is that every time we mark a spot, we can increment
+ * running counts for every row, column, diagonal, or square that contains this
+ * spot, and the game is over as soon as any of these counts hits 4.  Instead
+ * of explicitly using collections, we harness fact that storing 4 requires only
+ * three bits, and with 19 unique win conditions (4 horizontals, 4 verticals, 2
+ * diagonals, 9 squares), we only need 57 bits.  Thus, a 64-bit {@code long} is
+ * plenty, and we keep one per color ({@code redCache} and {@code blackCache}).
+ * Each triple of bits, starting from the right, represents each row from top to
+ * bottom, each vertical from left to right, the downward diagonal, the upward
+ * diagonal, and each 2x2 square (left to right within each row from top to
+ * bottom), respectively.  So, for example, a {@code cache} value of {@code
+ * 001,010,001,010,100,010,001,010,001;010,010;000,010,010,000;000,010,010,000}
+ * (commas distinguish specifics within a "type" like square or vertical,
+ * semicolons distinguish a new type) indicates exactly
+ * <p><ul>
+ * <li>0 spots filled for each "outer" horizontal and vertical
+ * <li>1 spot filled for each "corner" 2x2 square
+ * <li>2 spots filled for each "inner" horizontal, "inner" vertical, and the
+ * top- and bottom-middle 2x2 squares
+ * <li>3 spots filled nowhere on the board
+ * <li>4 spots filled in the middle 2x2 square
+ * </ul>
+ * <p>
+ * You may correctly deduce this to mean that the middle 2x2 square has been
+ * filled out.
+ * <p>
+ * Initially, {@code cache} is {@code 0}.  Whenever a piece is placed, the right
+ * bit triples in {@code cache} must be incremented by 1.  If we knew exactly
+ * which triples to increment for a given move, we could achieve this in
+ * "parallel" by simply adding the right number (whose binary representation has
+ * every triple, leading zeros excluded, take the form of either {@code 000} or
+ * {@code 001}) to {@code cache}.  Luckily, these numbers <em>are</em>
+ * statically known and are stored in {@code INCREMENTS}.
  */
 class NiyaState implements State<NiyaMove> {
 
@@ -23,46 +56,19 @@ class NiyaState implements State<NiyaMove> {
    * board} index {@code idx} maps to the (zero-indexed) grid row {@code idx /
    * 4} and grid column {@code idx % 4}.
    */
-  private Spot[] board;
+  private Spot[] board; // match state
+  private Spot previous; // (possibly null) Spot selected in previous turn
+  private int movesMade; // moves made so far
+  private Color winner; // winner as of current turn
+  private List<NiyaMove> validMoves; // valid moves on current turn
+  private long redCache; // accelerates red win determination
+  private long blackCache; // accelerates black win determination
 
-  /**
-   * The {@code Spot} that was selected in the previous turn, {@code null} if
-   * and only if no moves were played yet.
-   */
-  private Spot previous;
-
-  /**
-   * The number of moves that have been played so far.
-   */
-  private int movesMade;
-
-  /**
-   * The winner of the {@code Game} managed by this {@code NiyaState}.  {@code
-   * NONE} if either the match is still going or the match ended in a tie.
-   */
-  private Color winner;
-
-  private List<NiyaMove> validMoves;
-
-  private long redCache;
-  private long blackCache;
   private static final long[] INCREMENTS = new long[]{
-      0x41001001L,
-      0x240008001L,
-      0x1200040001L,
-      0x1008200001L,
-      0x8040001008L,
-      0x48241008008L,
-      0x241208040008L,
-      0x201000200008L,
-      0x1008000001040L,
-      0x9048008008040L,
-      0x48240001040040L,
-      0x40200000200040L,
-      0x1000008001200L,
-      0x9000000008200L,
-      0x48000000040200L,
-      0x40000001200200L
+      0x41001001L, 0x240008001L, 0x1200040001L, 0x1008200001L,
+      0x8040001008L, 0x48241008008L, 0x241208040008L, 0x201000200008L,
+      0x1008000001040L, 0x9048008008040L, 0x48240001040040L, 0x40200000200040L,
+      0x1000008001200L, 0x9000000008200L, 0x48000000040200L, 0x40000001200200L
     };
 
   /**

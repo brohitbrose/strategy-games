@@ -1,9 +1,5 @@
 package game.niya;
 
-import recon.Form;
-import recon.Record;
-import recon.Value;
-
 /**
  * Straightforward wrapper class for a desired play's row and column indices.
  */
@@ -26,29 +22,5 @@ class NiyaMove {
   public String toString() {
     return "(" + row + "," + col + ")";
   }
-
-  static final Form<NiyaMove> FORM = new Form<NiyaMove>() {
-    @Override
-    public String getTag() {
-      return "move";
-    }
-    @Override
-    public Class<?> getType() {
-      return NiyaMove.class;
-    }
-
-    @Override
-    public Value mold(NiyaMove move) {
-      return Record.of().attr(getTag()).item(move.row).item(move.col);
-    }
-
-    @Override
-    public NiyaMove cast(Value value) {
-      if (getTag().equals(value.head().asAttr().getKey().stringValue())) {
-        return new NiyaMove(value.getItem(1).intValue(), value.getItem(2).intValue());
-      }
-      return null;
-    }
-  };
 }
 
