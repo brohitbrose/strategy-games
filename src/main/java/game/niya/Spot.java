@@ -1,8 +1,5 @@
 package game.niya;
 
-import recon.Record;
-import recon.Value;
-
 class Spot {
 
   enum Plant { MAPLE, CHERRY, PINE, IRIS }
@@ -34,9 +31,5 @@ class Spot {
   @Override
   public String toString() {
     return " (" + plant + ", " + poem + ")";
-  }
-
-  Value toValue() {
-    return Record.of().item(color.toString()).item(idx);
   }
 }

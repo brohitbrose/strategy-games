@@ -7,6 +7,9 @@ import java.util.List;
  */
 public interface State<T> {
 
+  /**
+   * The number of moves that have been played so far.
+   */
   int movesMade();
 
   /**
@@ -26,5 +29,9 @@ public interface State<T> {
    */
   boolean isOver();
 
+  /**
+   * Displays a human-readable representation of this {@code State} to {@code
+   * stdout}.
+   */
   void debug();
 }
