@@ -37,27 +37,8 @@ public final class Niya implements Game<NiyaMove> {
     // Set players
     this.red = red;
     this.black = black;
-
-    // Sanitize and set initial state
-    final Spot[] spots = new Spot[16];
-    if (initialState.length == 16) {
-      boolean[] tmp = new boolean[16];
-      for (int idx = 0; idx < 16; idx++) {
-        final int i = initialState[idx];
-        try {
-          if (tmp[i]) {
-            throw new IllegalArgumentException();
-          }
-          tmp[i] = true;
-          spots[idx] = new Spot(i);
-        } catch (ArrayIndexOutOfBoundsException e) {
-          throw new IllegalArgumentException();
-        }
-      }
-    } else {
-      throw new IllegalArgumentException();
-    }
-    state = new NiyaState(spots);
+    // Set initial state
+    state = new NiyaState(initialState);
   }
 
   /**

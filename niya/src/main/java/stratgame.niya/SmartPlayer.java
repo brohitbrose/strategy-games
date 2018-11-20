@@ -19,7 +19,9 @@ public class SmartPlayer implements NiyaPlayer {
    * Constructs a new {@code SmartPlayer} with color {@code color}.
    */
   public SmartPlayer(Color color) {
-    if (color == Color.NONE) throw new IllegalArgumentException();
+    if (color == Color.NONE) {
+      throw new IllegalArgumentException("Player color cannot be NONE");
+    }
     this.color = color;
   }
 

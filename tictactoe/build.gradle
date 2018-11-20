@@ -3,9 +3,18 @@ plugins {
   id 'application'
 }
 
+repositories {
+  mavenCentral()
+}
+
 dependencies {
   compile project(':ai')
   compile project(':game')
+  testCompile 'org.testng:testng:6.10'
+}
+
+test {
+  useTestNG() { }
 }
 
 mainClassName='stratgame.tictactoe.Main'

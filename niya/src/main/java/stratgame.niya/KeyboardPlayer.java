@@ -18,6 +18,15 @@ public class KeyboardPlayer implements NiyaPlayer {
 
   @Override
   public NiyaMove decide(State<NiyaMove> s, List<NiyaMove> possible) {
-    return new NiyaMove(keyboard.nextInt(), keyboard.nextInt());
+    NiyaMove decision;
+    while (true) {
+      try {
+        decision = new NiyaMove(keyboard.nextInt(), keyboard.nextInt());
+        break;
+      } catch (IllegalArgumentException e) {
+        System.out.println("Try again: " + e.getMessage());
+      }
+    }
+    return decision;
   }
 }

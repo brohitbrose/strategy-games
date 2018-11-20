@@ -1,8 +1,8 @@
 package stratgame.tictactoe;
 
-import stratgame.game.State;
 import java.util.ArrayList;
 import java.util.List;
+import stratgame.game.State;
 
 /**
  * Internal class that manages the state of a Tic-tac-toe match.  Once a {@code
@@ -100,8 +100,9 @@ public class TTTState implements State<Integer> {
 
   @Override
   public boolean makeMove(Integer m) {
-    if (isOver() || // can't make move if game is over...
-        ((3 << (m << 1)) & board) != 0) { // ...or position is already occupied
+    if (isOver() // can't make move if game is over...
+        || (m < 0 || m > 8) // or m is outside 0..=8
+        || ((3 << (m << 1)) & board) != 0) { // ...or m is occupied
       return false;
     }
     boolean x = (movesMade & 1) == 0; // true if X is current player
@@ -179,7 +180,7 @@ public class TTTState implements State<Integer> {
         } else if (filter == 2) {
           System.out.print('X'); // 0b10 indicates 'X'
         } else {
-          throw new IllegalStateException(); // should never see 0b11
+          throw new AssertionError("spot value was not 0, 1, or 2");
         }
         // once displayed, bits no longer needed. Shift for next grid position.
         copy = (copy >>> 2);

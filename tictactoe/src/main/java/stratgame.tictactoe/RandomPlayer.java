@@ -1,7 +1,7 @@
 package stratgame.tictactoe;
 
-import stratgame.game.State;
 import java.util.List;
+import stratgame.game.State;
 
 /**
  * {@link TTTPlayer} that chooses a move from {@code possible} at random.

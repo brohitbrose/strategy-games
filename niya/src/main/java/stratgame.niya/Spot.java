@@ -10,7 +10,7 @@ class Spot {
   private final int idx;
   Color color;
 
-  public Spot(int plant, int poem) {
+  Spot(int plant, int poem) {
     this.plant = Plant.values()[plant];
     this.poem = Poem.values()[poem];
     idx = (plant << 2) + poem;

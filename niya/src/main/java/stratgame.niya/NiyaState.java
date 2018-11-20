@@ -100,7 +100,7 @@ public class NiyaState implements State<NiyaMove> {
    * Constructs a new {@code NiyaState} initialized with a copy of the entries,
    * sans color, in {@code initialState}.
    */
-  public NiyaState(Spot[] initialState) {
+  NiyaState(Spot[] initialState) {
     previous = null;
     movesMade = 0;
     winner = Color.NONE;
@@ -117,6 +117,9 @@ public class NiyaState implements State<NiyaMove> {
     updateValidMoves();
   }
 
+  public NiyaState(int[] initialState) {
+    this(intsToSpots(initialState));
+  }
 
   /**
    * Copy constructor.
@@ -143,6 +146,28 @@ public class NiyaState implements State<NiyaMove> {
       moves.add(new NiyaMove(m));
     }
     validMoves = moves;
+  }
+
+  private static Spot[] intsToSpots(int[] initialState) {
+    final Spot[] spots = new Spot[16];
+    if (initialState.length == 16) {
+      boolean[] tmp = new boolean[16];
+      for (int idx = 0; idx < 16; idx++) {
+        final int i = initialState[idx];
+        try {
+          if (tmp[i]) {
+            throw new IllegalArgumentException("initialState cannot have duplicates");
+          }
+          tmp[i] = true;
+          spots[idx] = new Spot(i);
+        } catch (ArrayIndexOutOfBoundsException e) {
+          throw new IllegalArgumentException("initialState element must be in 0..=15");
+        }
+      }
+    } else {
+      throw new IllegalArgumentException("initialState must have size 16");
+    }
+    return spots;
   }
 
   /**

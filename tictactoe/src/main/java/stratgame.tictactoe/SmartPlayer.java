@@ -1,8 +1,8 @@
 package stratgame.tictactoe;
 
+import java.util.List;
 import stratgame.ai.Negamaxable;
 import stratgame.game.State;
-import java.util.List;
 
 /**
  * {@link TTTPlayer} that uses a minimax strategy to decide plays.
@@ -12,7 +12,9 @@ public class SmartPlayer implements TTTPlayer {
   private final Piece piece;
 
   public SmartPlayer(Piece piece) {
-    if (piece == Piece.NONE) throw new IllegalArgumentException();
+    if (piece == Piece.NONE) {
+      throw new IllegalArgumentException("Player piece cannot be NONE");
+    }
     this.piece = piece;
   }
 

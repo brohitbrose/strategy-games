@@ -1,6 +1,6 @@
 # Niya
 
-Game loop, AI, and UI for the Niya board game.
+Game loop and AI for the Niya board game.
 
 ## Gameplay
 
@@ -16,12 +16,13 @@ Game loop, AI, and UI for the Niya board game.
 ### Rules
 
 1. Arrange the tiles, preferably at random, in a 4x4 grid.
-2. The red player moves first by replacing a tile with a red token. Only on this
+2. The RED player moves first by replacing a tile with a RED token. Only on this
 first move, this tile *must* come from the border, i.e. the inner 2x2 square is
 forbidden.
-3. The black player moves second. Although the "border rule" no longer applies,
-an even stricter rule is now in play *for the rest of the match*: every move
-must now match either the "plant" or the "poem" of the move before it.
+3. The BLACK player moves second by replacing a tile with a BLACK token.
+Although the "border rule" no longer applies, an even stricter rule is now in
+play *for the rest of the match*: every move must now match either the "plant"
+or the "poem" of the move before it.
 4. Players alternate turns until one of the following conditions is met:
     - A move forms a complete row, column, diagonal, or 2x2 square of one color.
     The player who made this move wins.
