@@ -30,4 +30,12 @@ must now match either the "plant" or the "poem" of the move before it.
 
 ## Run
 
-TODO
+### Run in Gradle VM
+
+1. `gradle run`
+
+### Build with Gradle, run with shell
+
+1. `gradle build`
+2. `unzip build/distributions/niya.zip`
+3. `./niya`

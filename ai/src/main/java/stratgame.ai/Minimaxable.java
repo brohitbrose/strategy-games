@@ -1,10 +1,8 @@
 package stratgame.ai;
 
-import stratgame.game.State;
-
 /**
- * Mutable state (but not necessarily a {@link State}) with a computable
- * minimax value.
+ * Mutable state, not necessarily a {@code stratgame.game.State}, with a
+ * computable minimax value.
  */
 public interface Minimaxable<M> {
 
