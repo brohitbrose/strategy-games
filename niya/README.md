@@ -38,4 +38,4 @@ must now match either the "plant" or the "poem" of the move before it.
 
 1. `gradle build`
 2. `unzip build/distributions/niya.zip`
-3. `./niya`
+3. `./niya/niya`

@@ -12,4 +12,4 @@ Game loop and AI for [tic-tac-toe](https://en.wikipedia.org/wiki/Tic-tac-toe).
 
 1. `gradle build`
 2. `unzip build/distributions/tictactoe.zip`
-3. `./tictactoe`
+3. `./tictactoe/tictactoe`
