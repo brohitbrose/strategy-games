@@ -3,9 +3,21 @@ plugins {
   id 'application'
 }
 
+repositories {
+  mavenCentral()
+}
+
 dependencies {
   compile project(':ai')
   compile project(':game')
+  testCompile 'org.testng:testng:6.10'
 }
 
-mainClassName='stratgames.niya.Main'
+test {
+  useTestNG() {
+    scanForTestClasses = false
+    include '**/*Spec.class'
+  }
+}
+
+mainClassName='stratgame.niya.Main'

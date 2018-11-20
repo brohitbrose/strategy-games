@@ -14,7 +14,10 @@ dependencies {
 }
 
 test {
-  useTestNG() { }
+  useTestNG() {
+    scanForTestClasses = false
+    include '**/*Spec.class'
+  }
 }
 
 mainClassName='stratgame.tictactoe.Main'
