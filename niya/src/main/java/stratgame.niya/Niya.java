@@ -84,21 +84,10 @@ public final class Niya implements Game<NiyaMove> {
     await();
   }
 
-  private void hack(java.util.List<NiyaMove> validMoves) {
-    for (NiyaMove m : validMoves) {
-      System.out.print(state().getSpot(m) + " ");
-    }
-    System.out.println();
-  }
-
   @Override
   public void await() {
     final NiyaState copy = snapshot();
     System.out.println("Possible: " + copy.validMoves());
-    hack(copy.validMoves());
-    final NiyaMove m = current().decide(copy, copy.validMoves());
-    System.out.println("Settled on: " + m);
-    playMove(m);
-//    playMove(current().decide(copy, copy.validMoves()));
+    playMove(current().decide(copy, copy.validMoves()));
   }
 }

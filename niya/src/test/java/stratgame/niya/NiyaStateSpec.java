@@ -5,6 +5,7 @@ import static org.testng.Assert.assertEquals;
 
 public class NiyaStateSpec {
 
+  // trivial wrapper because Java construction is too verbose
   private static NiyaMove nm(int r, int c) {
     return new NiyaMove(r, c);
   }
@@ -14,6 +15,17 @@ public class NiyaStateSpec {
     NiyaState state;
 
     // first row
+    state = new NiyaState(new int[]{
+        0, 5, 12, 6,
+        8, 4, 13, 3,
+        15, 11, 1, 7,
+        10, 9, 14, 2
+      });
+    state.makeMove(nm(0,0)); state.makeMove(nm(3,3));
+    state.makeMove(nm(0,3)); state.makeMove(nm(3,2));
+    state.makeMove(nm(0,2)); state.makeMove(nm(1,2));
+    state.makeMove(nm(0,1));
+    assertEquals(state.winner(), Color.RED);
 
     // second row
     state = new NiyaState(new int[]{
@@ -29,8 +41,32 @@ public class NiyaStateSpec {
     assertEquals(state.winner(), Color.BLACK);
 
     // third row
+    state = new NiyaState(new int[]{
+        5, 11, 15, 7,
+        9, 12, 10, 14,
+        8, 3, 13, 6,
+        0, 2, 4, 1
+      });
+    state.makeMove(nm(2,0)); state.makeMove(nm(3,0));
+    state.makeMove(nm(2,1)); state.makeMove(nm(0,3));
+    state.makeMove(nm(2,3)); state.makeMove(nm(1,2));
+    state.makeMove(nm(0,1)); state.makeMove(nm(0,2));
+    state.makeMove(nm(2,2));
+    assertEquals(state.winner(), Color.RED);
 
     // fourth row
+    state = new NiyaState(new int[]{
+        15, 0, 1, 11,
+        12, 3, 6, 7,
+        9, 13, 14, 10,
+        2, 4, 8, 5
+      });
+    state.makeMove(nm(3,2)); state.makeMove(nm(1,0));
+    state.makeMove(nm(3,1)); state.makeMove(nm(1,2));
+    state.makeMove(nm(3,3)); state.makeMove(nm(2,1));
+    state.makeMove(nm(2,2)); state.makeMove(nm(2,3));
+    state.makeMove(nm(3,0));
+    assertEquals(state.winner(), Color.RED);
   }
 
   @Test
@@ -51,10 +87,45 @@ public class NiyaStateSpec {
     assertEquals(state.winner(), Color.BLACK);
 
     // second column
+    state = new NiyaState(new int[]{
+        5, 13, 15, 14,
+        9, 4, 6, 12,
+        2, 7, 0, 11,
+        3, 1, 8, 10
+      });
+    state.makeMove(nm(0,1)); state.makeMove(nm(0,2));
+    state.makeMove(nm(2,1)); state.makeMove(nm(1,2));
+    state.makeMove(nm(1,1)); state.makeMove(nm(1,3));
+    state.makeMove(nm(3,2)); state.makeMove(nm(1,0));
+    state.makeMove(nm(3,1));
+    assertEquals(state.winner(), Color.RED);
 
     // third column
+    state = new NiyaState(new int[]{
+        6, 13, 1, 7,
+        10, 11, 2, 12,
+        14, 3, 8, 0,
+        4, 9, 5, 15
+      });
+    state.makeMove(nm(3,2)); state.makeMove(nm(3,0));
+    state.makeMove(nm(2,2)); state.makeMove(nm(1,1));
+    state.makeMove(nm(3,1)); state.makeMove(nm(0,1));
+    state.makeMove(nm(0,2)); state.makeMove(nm(2,1));
+    state.makeMove(nm(1,2));
+    assertEquals(state.winner(), Color.RED);
 
     // fourth column
+    state = new NiyaState(new int[]{
+        7, 14, 5, 2,
+        10, 12, 8, 13,
+        4, 11, 1, 6,
+        15, 3, 9, 0
+      });
+    state.makeMove(nm(2,3)); state.makeMove(nm(2,0));
+    state.makeMove(nm(3,3)); state.makeMove(nm(3,1));
+    state.makeMove(nm(0,3)); state.makeMove(nm(0,1));
+    state.makeMove(nm(1,3));
+    assertEquals(state.winner(), Color.RED);
   }
 
 
@@ -90,7 +161,6 @@ public class NiyaStateSpec {
     state.makeMove(nm(2,0)); state.makeMove(nm(2,1));
     state.makeMove(nm(2,2)); state.makeMove(nm(0,3));
     assertEquals(state.winner(), Color.BLACK);
-
   }
 
   @Test
@@ -108,10 +178,20 @@ public class NiyaStateSpec {
     state.makeMove(nm(3,0)); state.makeMove(nm(1,0));
     state.makeMove(nm(2,2)); state.makeMove(nm(0,0));
     state.makeMove(nm(1,3)); state.makeMove(nm(0,1));
-    state.debug();
     assertEquals(state.winner(), Color.BLACK);
 
     // top-center
+    state = new NiyaState(new int[]{
+        11, 8, 6, 9,
+        14, 1, 10, 5,
+        7, 15, 2, 0,
+        3, 4, 13, 12
+      });
+    state.makeMove(nm(0,1)); state.makeMove(nm(2,3));
+    state.makeMove(nm(1,1)); state.makeMove(nm(2,2));
+    state.makeMove(nm(1,2)); state.makeMove(nm(1,0));
+    state.makeMove(nm(0,2));
+    assertEquals(state.winner(), Color.RED);
 
     // top-right
     state = new NiyaState(new int[]{
@@ -124,7 +204,6 @@ public class NiyaStateSpec {
     state.makeMove(nm(2,1)); state.makeMove(nm(0,3));
     state.makeMove(nm(3,3)); state.makeMove(nm(0,2));
     state.makeMove(nm(0,1)); state.makeMove(nm(1,3));
-    state.debug();
     assertEquals(state.winner(), Color.BLACK);
 
     // middle-left
@@ -139,7 +218,6 @@ public class NiyaStateSpec {
     state.makeMove(nm(3,0)); state.makeMove(nm(1,1));
     state.makeMove(nm(0,0)); state.makeMove(nm(1,0));
     state.makeMove(nm(3,1)); state.makeMove(nm(2,0));
-    state.debug();
     assertEquals(state.winner(), Color.BLACK);
 
     // middle-center
@@ -153,12 +231,33 @@ public class NiyaStateSpec {
     state.makeMove(nm(1,3)); state.makeMove(nm(1,1));
     state.makeMove(nm(3,2)); state.makeMove(nm(2,2));
     state.makeMove(nm(0,3)); state.makeMove(nm(1,2));
-    state.debug();
     assertEquals(state.winner(), Color.BLACK);
 
     // middle-right
+    state = new NiyaState(new int[]{
+        14, 5, 13, 0,
+        1, 11, 7, 4,
+        3, 9, 8, 2,
+        10, 6, 12, 15
+      });
+    state.makeMove(nm(2,3)); state.makeMove(nm(0,3));
+    state.makeMove(nm(2,2)); state.makeMove(nm(3,2));
+    state.makeMove(nm(1,3)); state.makeMove(nm(0,1));
+    state.makeMove(nm(1,2));
+    assertEquals(state.winner(), Color.RED);
 
     // bottom-left
+    state = new NiyaState(new int[]{
+        0, 13, 14, 1,
+        10, 15, 6, 12,
+        4, 2, 11, 7,
+        9, 5, 8, 3
+      });
+    state.makeMove(nm(3,1)); state.makeMove(nm(2,3));
+    state.makeMove(nm(2,0)); state.makeMove(nm(3,2));
+    state.makeMove(nm(3,0)); state.makeMove(nm(1,0));
+    state.makeMove(nm(2,1));
+    assertEquals(state.winner(), Color.RED);
 
     // bottom-center
     state = new NiyaState(new int[]{
@@ -171,7 +270,6 @@ public class NiyaStateSpec {
     state.makeMove(nm(0,0)); state.makeMove(nm(2,1));
     state.makeMove(nm(2,3)); state.makeMove(nm(3,2));
     state.makeMove(nm(0,3)); state.makeMove(nm(3,1));
-    state.debug();
     assertEquals(state.winner(), Color.BLACK);
 
     // bottom-right
@@ -185,7 +283,6 @@ public class NiyaStateSpec {
     state.makeMove(nm(2,1)); state.makeMove(nm(2,2));
     state.makeMove(nm(2,0)); state.makeMove(nm(3,2));
     state.makeMove(nm(3,0)); state.makeMove(nm(2,3));
-    state.debug();
     assertEquals(state.winner(), Color.BLACK);
   }
 
