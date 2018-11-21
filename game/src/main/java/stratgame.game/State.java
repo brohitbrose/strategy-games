@@ -3,9 +3,11 @@ package stratgame.game;
 import java.util.List;
 
 /**
- * Context used to manage the state of some {@link Game}.
+ * Mutable context used to manage the state of some {@link Game}.
+ *
+ * @param <M> the type of move that can be submitted to this {@code State}.
  */
-public interface State<T> {
+public interface State<M> {
 
   /**
    * The number of moves that have been played so far.
@@ -13,15 +15,15 @@ public interface State<T> {
   int movesMade();
 
   /**
-   * The list of {@code T} that can be played in the current turn.
+   * The list of {@code M} that can be played in the current turn.
    */
-  List<T> validMoves();
+  List<M> validMoves();
 
   /**
    * If {@code m} is a valid move, plays {@code m} and returns {@code true},
    * otherwise returns {@code false}.
    */
-  boolean makeMove(T m);
+  boolean makeMove(M m);
 
   /**
    * Returns true if and only if either no moves can be played or a player has

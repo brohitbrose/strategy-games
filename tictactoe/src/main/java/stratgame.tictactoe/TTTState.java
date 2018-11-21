@@ -5,7 +5,7 @@ import java.util.List;
 import stratgame.game.State;
 
 /**
- * Internal class that manages the state of a Tic-tac-toe match.  Once a {@code
+ * Context that manages the state of a Tic-tac-toe match.  Once a {@code
  * TTTState} instance is initialized, mutability of its fields is only offered
  * via calls to {@link #makeMove(Integer m)}.
  * <p>

@@ -6,7 +6,7 @@ import java.util.List;
 import stratgame.game.State;
 
 /**
- * Internal class that manages the state of a Niya game instance.  Once a {@code
+ * Context that manages the state of a Niya game instance.  Once a {@code
  * NiyaState} instance is initialized, mutability of its fields is only offered
  * via calls to either {@link #makeMove(NiyaMove)} or {@link #reset()}.
  * <p>

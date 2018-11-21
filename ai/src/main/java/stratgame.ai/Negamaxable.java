@@ -3,7 +3,7 @@ package stratgame.ai;
 import stratgame.game.State;
 
 /**
- * Mutable {@link State} with a computable negamax value.
+ * {@link State} with a computable negamax value.
  */
 public interface Negamaxable<M> extends Minimaxable<M>, State<M> {
 
@@ -35,6 +35,10 @@ public interface Negamaxable<M> extends Minimaxable<M>, State<M> {
    */
   Negamaxable<M> cloneAndMove(M m);
 
+  /**
+   * Returns the negamax value of this state without evaluating any further
+   * subtrees, e.g. by some heuristic or by treating this state as the endgame.
+   */
   int terminalValue();
 
   /**
