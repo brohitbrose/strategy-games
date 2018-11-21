@@ -6,7 +6,7 @@ of this project.
 
 For interface-level game lifecycle logic, visit the [game](./game) subfolder.
 
-For interface-level AI logic, visit the [game](./ai) subfolder.
+For interface-level AI logic, visit the [ai](./ai) subfolder.
 
 For a concrete Niya implementation, visit the [niya](./niya) subfolder.
 
