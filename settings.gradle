@@ -1,0 +1,6 @@
+rootProject.name = 'strategy-games'
+
+include 'ai'
+include 'game'
+include 'niya'
+include 'tictactoe'
