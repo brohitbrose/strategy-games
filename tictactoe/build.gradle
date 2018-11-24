@@ -18,6 +18,11 @@ test {
     scanForTestClasses = false
     include '**/*Spec.class'
   }
+  testLogging {
+    events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+    exceptionFormat 'full'
+    displayGranularity = 4
+  }
 }
 
 mainClassName='stratgame.tictactoe.Main'

@@ -1,3 +1,3 @@
 package stratgame.tictactoe;
 
-enum Piece { X, O, NONE }
+public enum Piece { X, O, NONE }

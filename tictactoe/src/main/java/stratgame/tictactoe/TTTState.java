@@ -39,8 +39,14 @@ public class TTTState implements State<Integer> {
   private int board; // match state
   private int movesMade; // moves made so far
   private List<Integer> validMoves; // valid moves on current turn
-  private Piece winner = Piece.NONE; // winner as of current turn
+  private Piece winner; // winner as of current turn
   private int cache; // accelerate win determination
+
+  private static final int[] INCREMENTS = new int[]{
+      0b0001000001000001, 0b0000000100000001, 0b0100010000000001,
+      0b0000000001000100, 0b0101000100000100, 0b0000010000000100,
+      0b0100000001010000, 0b0000000100010000, 0b0001010000010000
+    };
 
   /**
    * Constructs a new {@code TTTState} without any moves played.
@@ -52,6 +58,7 @@ public class TTTState implements State<Integer> {
     for (int i = 0; i < 9; i++) {
       this.validMoves.add(i);
     }
+    winner = Piece.NONE;
     this.cache = 0;
   }
 
@@ -63,6 +70,7 @@ public class TTTState implements State<Integer> {
     this.movesMade = s.movesMade;
     this.validMoves = new ArrayList<>(9);
     this.validMoves.addAll(s.validMoves);
+    this.winner = s.winner;
     this.cache = s.cache;
   }
 
@@ -83,74 +91,56 @@ public class TTTState implements State<Integer> {
     return validMoves;
   }
 
-  /**
-   * Returns the two bits of {@code cacheCopy} that are {@code filter} pairs
-   * from the right.
-   */
-  private static int extract(int cacheCopy, int filter) {
-    return ((cacheCopy & (3 << filter)) >>> filter);
+  protected int board() {
+    return board;
   }
 
   /**
-   * Returns 3 if either {@code val} or {@code foundThree} is 3, 1 otherwise.
+   * Blindly plays {@code m} and returns whether the act resulted in a victory.
    */
-  private static int collapse(int val, int foundThree) {
-    return ((((val >>> 1) & val) | ((foundThree >>> 1) & foundThree)) << 1) | 1;
+  private boolean moveAndCheck(int cacheCopy, Integer m, int offset, int boardOffset) {
+    // make move
+    board |= (1 << ((m << 1) + boardOffset));
+    movesMade++;
+    validMoves.remove(m);
+    // update cache
+    cacheCopy += INCREMENTS[m];
+    cache = (cacheCopy << offset) | (cache & (0xFFFF << (16 - offset)));
+    return ((cacheCopy & 0xAAAA) & ((cacheCopy & 0x5555) << 1)) != 0;
+  }
+
+  /**
+   * Returns the {@code Piece} that is responsible for the next move,
+   * {@code NONE} if the match is over or {@code nextMove} is invalid.
+   */
+  protected Piece currentPiece(Integer nextMove) {
+    return nextMove < 0 || nextMove > 8 // out of bounds
+        || isOver() // match is over
+        || ((3 << (nextMove << 1)) & board) != 0 ? // spot is occupied
+          Piece.NONE :
+        (movesMade & 1) == 0 ?
+          Piece.X : Piece.O;
   }
 
   @Override
-  public boolean makeMove(Integer m) {
-    if (isOver() // can't make move if game is over...
-        || (m < 0 || m > 8) // or m is outside 0..=8
-        || ((3 << (m << 1)) & board) != 0) { // ...or m is occupied
+  public final boolean makeMove(Integer m) {
+    final Piece p = currentPiece(m);
+    if (p == Piece.NONE) {
       return false;
     }
-    boolean x = (movesMade & 1) == 0; // true if X is current player
     int cacheCopy;
     int boardOffset;
-    Piece p;
     int offset;
-    if (x) {
-      p = Piece.X;
+    if (p == Piece.X) {
       offset = 0;
       boardOffset = 1;
       cacheCopy = (cache & 0xFFFF);
     } else {
-      p = Piece.O;
       offset = 16;
       boardOffset = 0;
       cacheCopy = (cache >>> 16);
     }
-    board |= (1 << ((m << 1) + boardOffset)); // make move
-    movesMade++;
-    validMoves.remove(m);
-
-    // relevant horizontal
-    int filter = (m / 3) << 1;
-    cacheCopy += (1 << filter);
-    int foundThree = extract(cacheCopy, filter); // possible 0, 1, 2, 3
-    // relevant vertical
-    filter = ((m % 3) + 3) << 1;
-    cacheCopy += (1 << filter);
-    int val = extract(cacheCopy, filter);
-    foundThree = collapse(val, foundThree); // possible 1, 3
-    // diagonal that slopes down
-    if ((m & 3) == 0) {
-      filter = 12;
-      cacheCopy += (1 << filter);
-      val = extract(cacheCopy, filter);
-      foundThree = collapse(val, foundThree); // possible 1, 3
-    }
-    // diagonal that slopes up
-    if (m == 2 || m == 4 || m == 6) {
-      filter = 14;
-      cacheCopy += (1 << filter);
-      val = extract(cacheCopy, filter);
-      foundThree = collapse(val, foundThree); // possible 1, 3
-    }
-    // update cache
-    cache = (cacheCopy << offset) | (cache & (0xFFFF << (16 - offset)));
-    if (foundThree == 3) {
+    if (moveAndCheck(cacheCopy, m, offset, boardOffset)) {
       winner = p;
       validMoves.clear();
     }
@@ -162,7 +152,7 @@ public class TTTState implements State<Integer> {
     return winner != Piece.NONE || validMoves.isEmpty();
   }
 
-  Piece winner() {
+  protected Piece winner() {
     return winner;
   }
 
