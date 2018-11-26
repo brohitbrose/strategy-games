@@ -100,7 +100,6 @@ public class UltimateState implements State<Integer> {
   private boolean moveAndCheck(int cacheCopy, int m, int offset, int boardOffset) {
     // make move
     board |= (1 << ((m << 1) + boardOffset));
-    movesMade++;
     // update cache
     cacheCopy += INCREMENTS[m];
     cache = (cacheCopy << offset) | (cache & (0xFFFF << (16 - offset)));
@@ -110,29 +109,32 @@ public class UltimateState implements State<Integer> {
   @Override
   public boolean makeMove(Integer m) {
     final int outer = outer(m);
+    final int prevInner = inner(previous);
     final Individual ind = individuals[outer];
-    if (previous == 0xFFFFFFFF || outer(previous) == outer || ind.isOver()) {
+    if (previous == 0xFFFFFFFF || prevInner == outer || individuals[prevInner].isOver()) {
       final Piece p = currentPiece();
       ind.currentPiece(p);
       boolean moveSucceeded = ind.makeMove(inner(m));
       if (moveSucceeded) {
-        int cacheCopy;
-        int boardOffset;
-        int offset;
-        if (p == Piece.X) {
-          offset = 0;
-          boardOffset = 1;
-          cacheCopy = (cache & 0xFFFF);
-        } else {
-          offset = 16;
-          boardOffset = 0;
-          cacheCopy = (cache >>> 16);
-        }
-        if (moveAndCheck(cacheCopy, outer, offset, boardOffset)) {
-          winner = p;
-        }
+        previous = m;
+        movesMade++;
         if (ind.isOver()) {
-          ultimateMoves.heuristic -= 9;  
+          ultimateMoves.heuristic -= 9;
+          int cacheCopy;
+          int boardOffset;
+          int offset;
+          if (p == Piece.X) {
+            offset = 0;
+            boardOffset = 1;
+            cacheCopy = (cache & 0xFFFF);
+          } else {
+            offset = 16;
+            boardOffset = 0;
+            cacheCopy = (cache >>> 16);
+          }
+          if (moveAndCheck(cacheCopy, outer, offset, boardOffset)) {
+            winner = p;
+          }
         }
       }
       return moveSucceeded;
@@ -179,7 +181,7 @@ public class UltimateState implements State<Integer> {
     // vertical borders
     for (int i = 1; i <= 9; i += 4) {
       for (int j = i; j <= i+2; j++) {
-        for (int k = 0; j <= 12; j+= 4) {
+        for (int k = 0; k <= 12; k += 4) {
           chars[j][k] = '|';
         }
       }
@@ -193,7 +195,7 @@ public class UltimateState implements State<Integer> {
         if (ind.winner() == Piece.X) { // if X won local match
           chars[row][col] = '@'; chars[row][col+1] = ' '; chars[row][col+2] = '@';
           chars[row+1][col] = ' '; chars[row+1][col+1] = '@'; chars[row+1][col+2] = ' ';
-          chars[row+2][col] = '@'; chars[row+2][col+1] = ' '; chars[row+1][col+2] = '@';
+          chars[row+2][col] = '@'; chars[row+2][col+1] = ' '; chars[row+2][col+2] = '@';
         } else if (ind.winner() == Piece.O) { // if O won local match
           for (int r = row; r < row+3; r++) {
             for (int c = col; c < col+3; c++) {
@@ -216,8 +218,9 @@ public class UltimateState implements State<Integer> {
       for (int j = 0; j < 13; j++) {
         System.out.print(chars[i][j]);
       }
+      System.out.println();
     }
-    System.out.println();
+    System.out.println("---");
   }
 
   private static int inner(int i) {
@@ -259,7 +262,7 @@ public class UltimateState implements State<Integer> {
 
     List<Integer> toList() {
       final ArrayList<Integer> result;
-      final int outer = UltimateState.outer(UltimateState.this.previous);
+      final int outer = UltimateState.inner(UltimateState.this.previous);
       if (UltimateState.this.previous != 0xFFFFFFFF && !individuals[outer].isOver()) {
         final Individual ind = individuals[outer];
         final int length = ind.validMoves().size();
