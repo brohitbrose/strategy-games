@@ -13,6 +13,9 @@ For a concrete Niya implementation, visit the [niya](./niya) subfolder.
 For a concrete tic-tac-toe implementation, visit the [tictactoe](./tictactoe)
 subfolder.
 
+For a concrete ultimate tic-tac-toe implementation, visit the
+[ultimate](./ultimate) subfolder.
+
 ## Build, Test, and Run
 
 We use [Gradle](https://gradle.org/install/) to build this project. After it is
