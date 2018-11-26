@@ -1,6 +1,6 @@
 # Ultimate
 
-Game loop and AI for [ultimate tic-tac-toe](https://en.wikipedia.org/wiki/Ultimate_tic-tac-toe).
+Game loop for [ultimate tic-tac-toe](https://en.wikipedia.org/wiki/Ultimate_tic-tac-toe).
 
 ## Run
 
