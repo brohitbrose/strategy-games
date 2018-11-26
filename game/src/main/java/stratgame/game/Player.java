@@ -12,5 +12,5 @@ public interface Player<M> {
   /**
    * Returns a move from {@code possible} after considering {@code state}.
    */
-  M decide(State<M> state, List<M> possible);
+  M decide(State<M> state);
 }

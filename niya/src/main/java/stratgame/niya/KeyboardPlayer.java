@@ -17,7 +17,7 @@ public class KeyboardPlayer implements NiyaPlayer {
   }
 
   @Override
-  public NiyaMove decide(State<NiyaMove> s, List<NiyaMove> possible) {
+  public NiyaMove decide(State<NiyaMove> s) {
     NiyaMove decision;
     while (true) {
       try {

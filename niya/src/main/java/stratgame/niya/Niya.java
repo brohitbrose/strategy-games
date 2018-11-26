@@ -88,6 +88,6 @@ public final class Niya implements Game<NiyaMove> {
   public void await() {
     final NiyaState copy = snapshot();
     System.out.println("Possible: " + copy.validMoves());
-    playMove(current().decide(copy, copy.validMoves()));
+    playMove(current().decide(copy));
   }
 }

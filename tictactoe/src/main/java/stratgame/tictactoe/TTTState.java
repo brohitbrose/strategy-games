@@ -5,7 +5,7 @@ import java.util.List;
 import stratgame.game.State;
 
 /**
- * Context that manages the state of a Tic-tac-toe match.  Once a {@code
+ * Context that manages the state of a tic-tac-toe match.  Once a {@code
  * TTTState} instance is initialized, mutability of its fields is only offered
  * via calls to {@link #makeMove(Integer m)}.
  * <p>
@@ -91,7 +91,7 @@ public class TTTState implements State<Integer> {
     return validMoves;
   }
 
-  protected int board() {
+  public int board() {
     return board;
   }
 
@@ -114,9 +114,10 @@ public class TTTState implements State<Integer> {
    * {@code NONE} if the match is over or {@code nextMove} is invalid.
    */
   protected Piece currentPiece(Integer nextMove) {
-    return nextMove < 0 || nextMove > 8 // out of bounds
+    int m = nextMove.intValue();
+    return m < 0 || m > 8 // out of bounds
         || isOver() // match is over
-        || ((3 << (nextMove << 1)) & board) != 0 ? // spot is occupied
+        || ((3 << (m << 1)) & board) != 0 ? // spot is occupied
           Piece.NONE :
         (movesMade & 1) == 0 ?
           Piece.X : Piece.O;
@@ -149,10 +150,13 @@ public class TTTState implements State<Integer> {
 
   @Override
   public boolean isOver() {
-    return winner != Piece.NONE || validMoves.isEmpty();
+    return validMoves.isEmpty();
   }
 
-  protected Piece winner() {
+  /**
+   * Returns the winner in this state if one exists, {@code NONE} otherwise.
+   */
+  public Piece winner() {
     return winner;
   }
 
