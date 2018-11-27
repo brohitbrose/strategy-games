@@ -267,7 +267,7 @@ public class UltimateState implements State<Integer> {
    * Returns the global index of the playable move {@code i}.
    */
   private static int outer(int i) {
-    return (i & 0xFFFF0000) >>> 16;
+    return i >>> 16;
   }
 
   /**
