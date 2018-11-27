@@ -24,13 +24,13 @@ import stratgame.tictactoe.TTTState;
  */
 public class UltimateState implements State<Integer> {
 
-  private int board;
-  private int movesMade;
-  private Piece winner;
-  private Individual[] individuals;
-  private UltimateMoves ultimateMoves;
+  private int board; // match state
+  private int movesMade; // moves made so far
+  private Piece winner; // winner as of current turn
+  private Individual[] individuals; // local games
   private int cache; // accelerate win determination
-  private int previous;
+  private int previous; // previous move
+  private int heuristic; // upper bound for valid move count
 
   private static final int[] INCREMENTS = new int[]{
       0b0001000001000001, 0b0000000100000001, 0b0100010000000001,
@@ -47,9 +47,9 @@ public class UltimateState implements State<Integer> {
         new Individual(), new Individual(), new Individual(),
         new Individual(), new Individual(), new Individual()
       };
-    this.ultimateMoves = this.new UltimateMoves(this.individuals);
     this.cache = cache;
     this.previous = 0xFFFFFFFF;
+    this.heuristic = 81;
   }
 
   /**
@@ -63,9 +63,9 @@ public class UltimateState implements State<Integer> {
     for (int i = 0; i < 9; i++) {
       this.individuals[i] = new Individual(s.individuals[i]);
     }
-    this.ultimateMoves = this.new UltimateMoves(s.ultimateMoves);
     this.cache = cache;
     this.previous = s.previous;
+    this.heuristic = s.heuristic;
   }
 
   /**
@@ -82,7 +82,32 @@ public class UltimateState implements State<Integer> {
 
   @Override
   public List<Integer> validMoves() {
-    return ultimateMoves.toList();
+    final ArrayList<Integer> result;
+    final int outer = inner(previous);
+    // if previous move restricts validMoves...
+    if (previous != 0xFFFFFFFF && !individuals[outer].isOver()) {
+      final Individual ind = individuals[outer];
+      final int length = ind.validMoves().size();
+      result = new ArrayList<>(length);
+      final int prefix = outer << 16;
+      // ...then return all valid moves from predetermined valid board...
+      for (Integer inner : ind.validMoves()) {
+        result.add(prefix + inner);
+      }
+    } else {
+      result = new ArrayList<>(heuristic);
+      // otherwise return all valid moves from all unfinished boards
+      for (int i = 0; i < 9; i++) {
+        Individual individual = individuals[i];
+        if (!individual.isOver()) {
+          final int prefix = i << 16;
+          for (Integer inner : individual.validMoves()) {
+            result.add(prefix + inner);
+          }
+        }
+      }
+    }
+    return result;
   }
 
   /**
@@ -108,18 +133,26 @@ public class UltimateState implements State<Integer> {
 
   @Override
   public boolean makeMove(Integer m) {
-    final int outer = outer(m);
-    final int prevInner = inner(previous);
-    final Individual ind = individuals[outer];
+    final int outer = outer(m); // outer index of this move
+    final int prevInner = inner(previous); // inner index of previous move
+    // validate m for this turn
     if (previous == 0xFFFFFFFF || prevInner == outer || individuals[prevInner].isOver()) {
       final Piece p = currentPiece();
+      // fail-fast if match is over
+      if (p == Piece.NONE) {
+        return false;
+      }
+      // play m in local game
+      final Individual ind = individuals[outer];
       ind.currentPiece(p);
       boolean moveSucceeded = ind.makeMove(inner(m));
       if (moveSucceeded) {
+        // update previous and movesMade if local play was successful
         previous = m;
         movesMade++;
         if (ind.isOver()) {
-          ultimateMoves.heuristic -= 9;
+          // decrement upper bound for valid move count, then update cache
+          heuristic -= 9;
           int cacheCopy;
           int boardOffset;
           int offset;
@@ -144,7 +177,7 @@ public class UltimateState implements State<Integer> {
 
   @Override
   public boolean isOver() {
-    return winner != Piece.NONE || ultimateMoves.toList().isEmpty();
+    return winner != Piece.NONE || validMoves().isEmpty();
   }
 
   // utility method to avoid even further debug() bloat
@@ -223,69 +256,30 @@ public class UltimateState implements State<Integer> {
     System.out.println("---");
   }
 
+  /**
+   * Returns the local index of the playable move {@code i}.
+   */
   private static int inner(int i) {
     return i & 0x0000FFFF;
   }
 
+  /**
+   * Returns the global index of the playable move {@code i}.
+   */
   private static int outer(int i) {
     return (i & 0xFFFF0000) >>> 16;
   }
 
+  /**
+   * Returns the projection of a move's global index {@code outer} and local
+   * index {@code inner} into a playable move.
+   */
   public static int project(int outer, int inner) {
     if (outer < 0 || outer > 8 || inner < 0 || inner > 8) {
       throw new IllegalArgumentException("outer and inner must be in 0..=8");
     }
     return (outer << 16) + inner;
   }
-
-  /**
-   * Self-contained logic to track valid moves within an {@code UltimateState}.
-   */
-  private class UltimateMoves {
-
-    private final Individual[] individuals;
-    private List<Integer> list;
-    private int heuristic;
-
-    UltimateMoves(Individual[] individuals) {
-      this.individuals = individuals;
-      this.heuristic = 81;
-    }
-
-    /**
-     * Copy constructor.
-     */
-    UltimateMoves(UltimateMoves um) {
-      this.individuals = um.individuals;
-      this.heuristic = um.heuristic;
-    }
-
-    List<Integer> toList() {
-      final ArrayList<Integer> result;
-      final int outer = UltimateState.inner(UltimateState.this.previous);
-      if (UltimateState.this.previous != 0xFFFFFFFF && !individuals[outer].isOver()) {
-        final Individual ind = individuals[outer];
-        final int length = ind.validMoves().size();
-        result = new ArrayList<>(length);
-        final int prefix = outer << 16;
-        for (Integer inner : ind.validMoves()) {
-          result.add(prefix + inner);
-        }
-      } else {
-        result = new ArrayList<>(heuristic);
-        for (int i = 0; i < 9; i++) {
-          Individual individual = individuals[i];
-          if (!individual.isOver()) {
-            final int prefix = i << 16;            
-            for (Integer inner : individual.validMoves()) {
-              result.add(prefix + inner);
-            }
-          }
-        }
-      }
-      return result;
-    }
-  }  
 }
 
 /**
