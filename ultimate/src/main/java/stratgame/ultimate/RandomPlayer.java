@@ -1,11 +1,12 @@
-package stratgame.tictactoe;
+package stratgame.ultimate;
 
 import stratgame.game.State;
 
 /**
- * {@link TTTPlayer} that chooses a move from {@code s.validMoves()} at random.
+ * {@link UltimatePlayer} that chooses a move from {@code s.validMoves()} at
+ * random.
  */
-public class RandomPlayer implements TTTPlayer {
+public class RandomPlayer implements UltimatePlayer {
 
   @Override
   public Integer decide(State<Integer> s) {

@@ -80,12 +80,19 @@ public class UltimateState implements State<Integer> {
     return movesMade;
   }
 
+  public Piece winner() {
+    return winner;
+  }
+
   @Override
   public List<Integer> validMoves() {
     final ArrayList<Integer> result;
     final int outer = inner(previous);
-    // if previous move restricts validMoves...
-    if (previous != 0xFFFFFFFF && !individuals[outer].isOver()) {
+    if (winner != Piece.NONE) {
+      // if a winner exists, return empty list
+      result = new ArrayList<>(0);
+    } else if (previous != 0xFFFFFFFF && !individuals[outer].isOver()) {
+      // otherwise, if previous move restricts validMoves...
       final Individual ind = individuals[outer];
       final int length = ind.validMoves().size();
       result = new ArrayList<>(length);
@@ -95,8 +102,8 @@ public class UltimateState implements State<Integer> {
         result.add(prefix + inner);
       }
     } else {
+      // otherwise, return all valid moves from all unfinished boards
       result = new ArrayList<>(heuristic);
-      // otherwise return all valid moves from all unfinished boards
       for (int i = 0; i < 9; i++) {
         Individual individual = individuals[i];
         if (!individual.isOver()) {
@@ -237,7 +244,7 @@ public class UltimateState implements State<Integer> {
           }
           chars[row+1][col+1] = ' ';
         } else { // local match was draw
-          for (int r = row; r < row+3; i++) {
+          for (int r = row; r < row+3; r++) {
             for (int c = col; c < col+3; c++) {
               chars[r][c] = '/';
             }

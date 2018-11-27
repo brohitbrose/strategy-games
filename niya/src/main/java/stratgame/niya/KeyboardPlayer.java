@@ -1,6 +1,5 @@
 package stratgame.niya;
 
-import java.util.List;
 import java.util.Scanner;
 import stratgame.game.State;
 

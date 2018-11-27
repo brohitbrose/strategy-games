@@ -1,7 +1,5 @@
 package stratgame.game;
 
-import java.util.List;
-
 /**
  * Entity responsible for playing moves in a {@link Game}.
  *
