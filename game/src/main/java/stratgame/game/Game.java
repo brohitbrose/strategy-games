@@ -28,7 +28,7 @@ public interface Game<M> {
   default void await() {
     final State<M> copy = snapshot();
     System.out.println("Possible: " + copy.validMoves());
-    playMove(current().decide(copy, copy.validMoves()));
+    playMove(current().decide(copy));
   }
 
   /**

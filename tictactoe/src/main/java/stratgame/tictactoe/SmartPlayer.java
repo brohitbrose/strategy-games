@@ -19,11 +19,12 @@ public class SmartPlayer implements TTTPlayer {
   }
 
   @Override
-  public Integer decide(State<Integer> trueState, List<Integer> possible) {
+  public Integer decide(State<Integer> trueState) {
     int bestValue = Integer.MIN_VALUE;
     int bestChoice = -1;
     int alpha = -100;
     int beta = 100;
+    final List<Integer> possible = trueState.validMoves();
     for (int choice : possible) {
       final View updatedState = new View(trueState, this.piece, alpha, beta, choice);
       final int nv = -updatedState.minimaxValue();

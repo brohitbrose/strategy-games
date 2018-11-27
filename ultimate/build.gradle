@@ -10,6 +10,7 @@ repositories {
 dependencies {
   compile project(':ai')
   compile project(':game')
+  compile project(':tictactoe')
   testCompile 'org.testng:testng:6.10'
 }
 
@@ -22,7 +23,7 @@ test {
     events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
     exceptionFormat 'full'
     displayGranularity = 4
-  }
+  }  
 }
 
-mainClassName='stratgame.niya.Main'
+mainClassName='stratgame.ultimate.Main'

@@ -26,11 +26,12 @@ public class SmartPlayer implements NiyaPlayer {
   }
 
   @Override
-  public NiyaMove decide(State<NiyaMove> trueState, List<NiyaMove> possible) {
+  public NiyaMove decide(State<NiyaMove> trueState) {
     int bestValue = Integer.MIN_VALUE;
     NiyaMove bestChoice = null;
     int alpha = -100;
     int beta = 100;
+    final List<NiyaMove> possible = trueState.validMoves();
     for (NiyaMove choice : possible) {
       final View updatedState = new View(trueState, this.color, alpha, beta, choice);
       final int nv = -updatedState.minimaxValue();

@@ -1,6 +1,5 @@
 package stratgame.niya;
 
-import java.util.List;
 import java.util.Scanner;
 import stratgame.game.State;
 
@@ -17,7 +16,7 @@ public class KeyboardPlayer implements NiyaPlayer {
   }
 
   @Override
-  public NiyaMove decide(State<NiyaMove> s, List<NiyaMove> possible) {
+  public NiyaMove decide(State<NiyaMove> s) {
     NiyaMove decision;
     while (true) {
       try {
