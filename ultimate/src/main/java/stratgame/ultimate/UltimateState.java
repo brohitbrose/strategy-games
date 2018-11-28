@@ -47,7 +47,7 @@ public class UltimateState implements State<Integer> {
         new Individual(), new Individual(), new Individual(),
         new Individual(), new Individual(), new Individual()
       };
-    this.cache = cache;
+    this.cache = 0;
     this.previous = 0xFFFFFFFF;
     this.heuristic = 81;
   }
@@ -63,7 +63,7 @@ public class UltimateState implements State<Integer> {
     for (int i = 0; i < 9; i++) {
       this.individuals[i] = new Individual(s.individuals[i]);
     }
-    this.cache = cache;
+    this.cache = s.cache;
     this.previous = s.previous;
     this.heuristic = s.heuristic;
   }
@@ -163,14 +163,16 @@ public class UltimateState implements State<Integer> {
           int cacheCopy;
           int boardOffset;
           int offset;
-          if (p == Piece.X) {
+          if (ind.winner() == Piece.X) {
             offset = 0;
             boardOffset = 1;
             cacheCopy = (cache & 0xFFFF);
-          } else {
+          } else if (ind.winner() == Piece.O) {
             offset = 16;
             boardOffset = 0;
             cacheCopy = (cache >>> 16);
+          } else {
+            return true;
           }
           if (moveAndCheck(cacheCopy, outer, offset, boardOffset)) {
             winner = p;
@@ -187,26 +189,29 @@ public class UltimateState implements State<Integer> {
     return winner != Piece.NONE || validMoves().isEmpty();
   }
 
-  // utility method to avoid even further debug() bloat
-  private void buildUnfinished(char[][] chars, int row, int col, Individual ind) {
-    int copy = ind.board();
-    final int mask = 3; // 0b0000...011
-    for (int i = 0; i < 3; i++) {
-      for (int j = 0; j < 3; j++) {
-        int filter = copy & mask; // last two bits of `board`
-        if (filter == 0) {
-          chars[row+i][col+j] = '_'; // 0b00 indicates no moves were made
-        } else if (filter == 1) {
-          chars[row+i][col+j] = 'O'; // 0b01 indicates 'O'
-        } else if (filter == 2) {
-          chars[row+i][col+j] = 'X'; // 0b10 indicates 'X'
-        } else {
-          throw new AssertionError("spot value was not 0, 1, or 2");
-        }
-        // once displayed, bits no longer needed. Shift for next grid position.
-        copy = (copy >>> 2);
-      }
+  /**
+   * Returns the local index of the playable move {@code i}.
+   */
+  private static int inner(int i) {
+    return i & 0x0000FFFF;
+  }
+
+  /**
+   * Returns the global index of the playable move {@code i}.
+   */
+  private static int outer(int i) {
+    return i >>> 16;
+  }
+
+  /**
+   * Returns the projection of a move's global index {@code outer} and local
+   * index {@code inner} into a playable move.
+   */
+  public static int project(int outer, int inner) {
+    if (outer < 0 || outer > 8 || inner < 0 || inner > 8) {
+      throw new IllegalArgumentException("outer and inner must be in 0..=8");
     }
+    return (outer << 16) + inner;
   }
 
   @Override
@@ -248,7 +253,7 @@ public class UltimateState implements State<Integer> {
             for (int c = col; c < col+3; c++) {
               chars[r][c] = '/';
             }
-          }          
+          }
         }
       } else { // local match is ongoing
         buildUnfinished(chars, row, col, ind);
@@ -262,30 +267,26 @@ public class UltimateState implements State<Integer> {
     }
     System.out.println("---");
   }
-
-  /**
-   * Returns the local index of the playable move {@code i}.
-   */
-  private static int inner(int i) {
-    return i & 0x0000FFFF;
-  }
-
-  /**
-   * Returns the global index of the playable move {@code i}.
-   */
-  private static int outer(int i) {
-    return i >>> 16;
-  }
-
-  /**
-   * Returns the projection of a move's global index {@code outer} and local
-   * index {@code inner} into a playable move.
-   */
-  public static int project(int outer, int inner) {
-    if (outer < 0 || outer > 8 || inner < 0 || inner > 8) {
-      throw new IllegalArgumentException("outer and inner must be in 0..=8");
+  // utility method to avoid even further debug() bloat
+  private void buildUnfinished(char[][] chars, int row, int col, Individual ind) {
+    int copy = ind.board();
+    final int mask = 3; // 0b0000...011
+    for (int i = 0; i < 3; i++) {
+      for (int j = 0; j < 3; j++) {
+        int filter = copy & mask; // last two bits of `board`
+        if (filter == 0) {
+          chars[row+i][col+j] = '_'; // 0b00 indicates no moves were made
+        } else if (filter == 1) {
+          chars[row+i][col+j] = 'O'; // 0b01 indicates 'O'
+        } else if (filter == 2) {
+          chars[row+i][col+j] = 'X'; // 0b10 indicates 'X'
+        } else {
+          throw new AssertionError("spot value was not 0, 1, or 2");
+        }
+        // once displayed, bits no longer needed. Shift for next grid position.
+        copy = (copy >>> 2);
+      }
     }
-    return (outer << 16) + inner;
   }
 }
 

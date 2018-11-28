@@ -84,10 +84,7 @@ public final class Niya implements Game<NiyaMove> {
     await();
   }
 
-  @Override
-  public void await() {
-    final NiyaState copy = snapshot();
-    System.out.println("Possible: " + copy.validMoves());
-    playMove(current().decide(copy));
+  public Color winner() {
+    return state.winner();
   }
 }

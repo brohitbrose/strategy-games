@@ -3,6 +3,7 @@ package stratgame.ultimate;
 import stratgame.game.Game;
 import stratgame.game.Player;
 import stratgame.game.State;
+import stratgame.tictactoe.Piece;
 
 /**
  * {@link Game} that manages the lifecycle of an ultimate tic-tac-toe match.
@@ -51,5 +52,9 @@ public class Ultimate implements Game<Integer> {
   @Override
   public void start() {
     await();
+  }
+
+  public Piece winner() {
+    return state.winner();
   }
 }

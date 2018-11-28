@@ -303,6 +303,7 @@ public class NiyaState implements State<NiyaMove> {
       }
       System.out.println();
     }
+    System.out.println("----------");
   }
 
   @Override
@@ -315,8 +316,6 @@ public class NiyaState implements State<NiyaMove> {
       }
       System.out.println();
     }
-    if (isOver()) {
-      System.out.println("WINNER: " + winner);
-    }
+    System.out.println("---");
   }
 }

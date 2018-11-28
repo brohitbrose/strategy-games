@@ -52,4 +52,8 @@ public final class TicTacToe implements Game<Integer> {
   public void start() {
     await();
   }
+
+  public Piece winner() {
+    return state.winner();
+  }
 }
