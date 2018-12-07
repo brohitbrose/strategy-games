@@ -21,8 +21,8 @@ public class SmartPlayer extends NegamaxPlayer<NiyaMove, Color, NiyaState> {
   }
 
   @Override
-  public View candidate(State<NiyaMove> trueState, Color piece, int alpha, int beta, NiyaMove choice) {
-    return new View(trueState, piece, alpha, beta, choice);
+  protected View candidate(State<NiyaMove> trueState, Color piece, int alpha, int beta, NiyaMove choice) {
+    return new View(trueState, alpha, beta, choice);
   }
 
   /**
@@ -41,12 +41,12 @@ public class SmartPlayer extends NegamaxPlayer<NiyaMove, Color, NiyaState> {
    */
   private class View extends NegamaxView<NiyaMove, Color, NiyaState> {
 
-    View(NiyaState trueState, Color p, int alpha, int beta, NiyaMove choice) {
-      super(trueState, p, alpha, beta, choice);
+    View(NiyaState trueState, int alpha, int beta, NiyaMove choice) {
+      super(trueState, piece, alpha, beta, choice);
     }
 
-    View(State<NiyaMove> trueState, Color p, int alpha, int beta, NiyaMove choice) {
-      this((NiyaState) trueState, p, alpha, beta, choice);
+    View(State<NiyaMove> trueState, int alpha, int beta, NiyaMove choice) {
+      this((NiyaState) trueState, alpha, beta, choice);
     }
 
     View(View view, NiyaMove choice) {

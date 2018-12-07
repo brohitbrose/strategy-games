@@ -24,7 +24,7 @@ public abstract class NegamaxPlayer<M,
    * in {@code trueState} at position {@code choice}, assuming that the current
    * negamax bounds are {@code alpha} and {@code beta}.
    */
-  public abstract NegamaxView<M, P, S> candidate(State<M> trueState, P piece, int alpha, int beta, M choice);
+  protected abstract NegamaxView<M, P, S> candidate(State<M> trueState, P piece, int alpha, int beta, M choice);
 
   @Override
   public M decide(State<M> trueState) {
