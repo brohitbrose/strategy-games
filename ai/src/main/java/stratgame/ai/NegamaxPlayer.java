@@ -4,17 +4,27 @@ import java.util.List;
 import stratgame.game.Player;
 import stratgame.game.State;
 
+/**
+ * {@link Player} that uses a minimax strategy to decide plays.
+ */
 public abstract class NegamaxPlayer<M,
                                     P,
-                                    S extends State<M>,
-                                    N extends NegamaxView<M, P, S>>
+                                    S extends State<M>>
     implements Player<M> {
 
+  /**
+   * The mark that identifies this {@code Player} in a game.
+   */
   protected P piece;
 
   public NegamaxPlayer() { }
 
-  public abstract N candidate(State<M> trueState, P piece, int alpha, int beta, M choice);
+  /**
+   * Returns the {@code NegamaxView} that is the result of placing {@code piece}
+   * in {@code trueState} at position {@code choice}, assuming that the current
+   * negamax bounds are {@code alpha} and {@code beta}.
+   */
+  public abstract NegamaxView<M, P, S> candidate(State<M> trueState, P piece, int alpha, int beta, M choice);
 
   @Override
   public M decide(State<M> trueState) {
@@ -36,5 +46,4 @@ public abstract class NegamaxPlayer<M,
     }
     return bestChoice;
   }
-
 }
