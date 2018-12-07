@@ -12,12 +12,12 @@ public final class TicTacToe implements Game<Integer> {
   /**
    * The {@code Player} that moves on the first and every alternate turn.
    */
-  private final TTTPlayer x;
+  private final Player<Integer> x;
 
   /**
    * The {@code Player} that moves on the second and every alternate turn.
    */
-  private final TTTPlayer o;
+  private final Player<Integer> o;
 
   /**
    * Internal {@link TTTState}.
@@ -27,7 +27,7 @@ public final class TicTacToe implements Game<Integer> {
   /**
    * Initializes a blank {@code TicTacToe} instance.
    */
-  public TicTacToe(TTTPlayer x, TTTPlayer o) {
+  public TicTacToe(Player<Integer> x, Player<Integer> o) {
     this.x = x;
     this.o = o;
     this.state = new TTTState();

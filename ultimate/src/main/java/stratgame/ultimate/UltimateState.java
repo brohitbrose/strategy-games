@@ -76,6 +76,11 @@ public class UltimateState implements State<Integer> {
   }
 
   @Override
+  public State<Integer> clone() {
+    return new UltimateState(this);
+  }
+
+  @Override
   public int movesMade() {
     return movesMade;
   }
@@ -267,6 +272,8 @@ public class UltimateState implements State<Integer> {
     }
     System.out.println("---");
   }
+
+
   // utility method to avoid even further debug() bloat
   private void buildUnfinished(char[][] chars, int row, int col, Individual ind) {
     int copy = ind.board();

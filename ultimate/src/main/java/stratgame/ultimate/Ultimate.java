@@ -13,12 +13,12 @@ public class Ultimate implements Game<Integer> {
   /**
    * The {@code Player} that moves on the first and every alternate turn.
    */
-  private final UltimatePlayer x;
+  private final Player<Integer> x;
 
   /**
    * The {@code Player} that moves on the second and every alternate turn.
    */
-  private final UltimatePlayer o;
+  private final Player<Integer> o;
 
   /**
    * Internal {@link UltimateState}.
@@ -28,7 +28,7 @@ public class Ultimate implements Game<Integer> {
   /**
    * Initializes a blank {@code TicTacToe} instance.
    */
-  public Ultimate(UltimatePlayer x, UltimatePlayer o) {
+  public Ultimate(Player<Integer> x, Player<Integer> o) {
     this.x = x;
     this.o = o;
     this.state = new UltimateState();

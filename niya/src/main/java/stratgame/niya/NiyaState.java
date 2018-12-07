@@ -128,6 +128,11 @@ public class NiyaState implements State<NiyaMove> {
     this((NiyaState) s);
   }
 
+  @Override
+  public NiyaState clone() {
+    return new NiyaState(this);
+  }
+
   /**
    * Copy constructor.
    */

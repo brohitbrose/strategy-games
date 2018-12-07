@@ -36,4 +36,6 @@ public interface State<M> {
    * stdout}.
    */
   void debug();
+
+  State<M> clone();
 }

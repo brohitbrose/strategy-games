@@ -74,6 +74,11 @@ public class TTTState implements State<Integer> {
     this.cache = s.cache;
   }
 
+  @Override
+  public TTTState clone() {
+    return new TTTState(this);
+  }
+
   /**
    * Copy constructor.
    */

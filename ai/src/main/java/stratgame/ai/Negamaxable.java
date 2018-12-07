@@ -5,7 +5,7 @@ import stratgame.game.State;
 /**
  * {@link State} with a computable negamax value.
  */
-public interface Negamaxable<M> extends Minimaxable<M>, State<M> {
+public interface Negamaxable<M> extends Minimaxable<M> {
 
   /**
    * The lower bound of possible negamax values that this {@code Negamaxable}
@@ -45,24 +45,7 @@ public interface Negamaxable<M> extends Minimaxable<M>, State<M> {
    * The negamax value of this {@link State}, with a default alpha-beta pruning
    * implementation.
    */
-  default int negamaxValue(int color) {
-    if (this.isOver()) {
-      return color * terminalValue();
-    }
-    int bestSoFar = Integer.MIN_VALUE;
-    for (M choice : this.validMoves()) {
-      final Negamaxable<M> updatedState = cloneAndMove(choice);
-      final int newValue = -updatedState.negamaxValue(-color);
-      if (newValue > bestSoFar) {
-        bestSoFar = newValue;
-        if (bestSoFar > alpha()) {
-          alpha(bestSoFar);
-          if (alpha() >= beta()) break;
-        }
-      }
-    }
-    return bestSoFar;
-  }
+  int negamaxValue(int color);
 
   @Override
   default int minimaxValue() {
