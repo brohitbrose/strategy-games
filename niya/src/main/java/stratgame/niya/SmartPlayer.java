@@ -6,7 +6,7 @@ import stratgame.ai.Negamaxable;
 import stratgame.game.State;
 
 /**
- * {@link NiyaPlayer} that uses a minimax strategy to decide plays.
+ * {@link stratgame.game.Player} that uses a minimax strategy to decide plays.
  */
 public class SmartPlayer extends NegamaxPlayer<NiyaMove, Color, NiyaState, View> {
 
@@ -14,10 +14,10 @@ public class SmartPlayer extends NegamaxPlayer<NiyaMove, Color, NiyaState, View>
    * Constructs a new {@code SmartPlayer} with color {@code color}.
    */
   public SmartPlayer(Color color) {
-    super(color);
     if (color == Color.NONE) {
       throw new IllegalArgumentException("Player color cannot be NONE");
     }
+    this.piece = color;
   }
 
   @Override

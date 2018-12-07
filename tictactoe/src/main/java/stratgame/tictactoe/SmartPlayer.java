@@ -11,10 +11,10 @@ import stratgame.game.State;
 public class SmartPlayer extends NegamaxPlayer<Integer, Piece, TTTState, View> {
 
   public SmartPlayer(Piece piece) {
-    super(piece);
     if (piece == Piece.NONE) {
       throw new IllegalArgumentException("Player piece cannot be NONE");
     }
+    this.piece = piece;
   }
 
   @Override

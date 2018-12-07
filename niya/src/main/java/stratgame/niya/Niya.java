@@ -60,7 +60,6 @@ public final class Niya implements Game<NiyaMove> {
       board[i-1] = board[idx];
       board[idx] = backup;
     }
-    System.out.println(java.util.Arrays.toString(board));
     return board;
   }
 

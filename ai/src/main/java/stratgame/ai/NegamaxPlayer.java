@@ -12,9 +12,7 @@ public abstract class NegamaxPlayer<M,
 
   protected P piece;
 
-  public NegamaxPlayer(P piece) {
-    this.piece = piece;
-  }
+  public NegamaxPlayer() { }
 
   public abstract N candidate(State<M> trueState, P piece, int alpha, int beta, M choice);
 
