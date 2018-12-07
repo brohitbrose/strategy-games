@@ -1,6 +1,5 @@
 package stratgame.niya;
 
-import java.util.List;
 import stratgame.ai.NegamaxPlayer;
 import stratgame.ai.NegamaxView;
 import stratgame.ai.Negamaxable;

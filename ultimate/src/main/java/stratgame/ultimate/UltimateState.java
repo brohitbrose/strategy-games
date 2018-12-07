@@ -17,10 +17,7 @@ import stratgame.tictactoe.TTTState;
  * represented by a {@code stratgame.tictactoe.TTTState}, except we must change
  * the logic that determines which {@code stratgame.tictactoe.Piece} will be
  * placed.  We capture this behavior in the {@code Individual} class, and an
- * {@code UltimateState} tracks nine such {@code Individuals}.  An {@code
- * UltimateState} is responsible for calling {@code currentPiece(Piece)} against
- * each {@code Individual} with the correct {@code Piece} before calling {@code
- * makeMove(Integer)}.
+ * {@code UltimateState} tracks nine such {@code Individuals}.
  */
 public class UltimateState implements State<Integer> {
 
@@ -156,7 +153,6 @@ public class UltimateState implements State<Integer> {
       }
       // play m in local game
       final Individual ind = individuals[outer];
-      ind.currentPiece(p);
       boolean moveSucceeded = ind.makeMove(inner(m));
       if (moveSucceeded) {
         // update previous and movesMade if local play was successful
@@ -273,7 +269,6 @@ public class UltimateState implements State<Integer> {
     System.out.println("---");
   }
 
-
   // utility method to avoid even further debug() bloat
   private void buildUnfinished(char[][] chars, int row, int col, Individual ind) {
     int copy = ind.board();
@@ -295,45 +290,30 @@ public class UltimateState implements State<Integer> {
       }
     }
   }
-}
-
-/**
- * Context that manages the state of a tic-tac-toe match within an Ultimate
- * match.
- */
-class Individual extends TTTState {
-
-  Piece currentPiece;
-
-  Individual() {
-    this.currentPiece = Piece.NONE;
-  }
 
   /**
-   * Copy constructor.
+   * Context that manages the state of a tic-tac-toe match within an Ultimate
+   * match.
    */
-  Individual(Individual s) {
-    super(s);
-    this.currentPiece = s.currentPiece;
-  }
+  private class Individual extends TTTState {
 
-  /**
-   * Copy constructor.
-   */
-  Individual(State<Integer> s) {
-    super(s);
-    this.currentPiece = Piece.NONE;
-  }
+    private Individual() {
+      // implicit call to super();
+    }
 
-  void currentPiece(Piece piece) {
-    currentPiece = piece;
-  }
+    /**
+     * Copy constructor.
+     */
+    private Individual(Individual s) {
+      super(s);
+    }
 
-  @Override
-  protected Piece currentPiece(Integer nextMove) {
-    return nextMove < 0 || nextMove > 8 // out of bounds
-        || isOver() // match is over
-        || ((3 << (nextMove << 1)) & board()) != 0 ? // spot is occupied
-          Piece.NONE : currentPiece;
+    @Override
+    protected Piece currentPiece(Integer nextMove) {
+      return nextMove < 0 || nextMove > 8 // out of bounds
+          || isOver() // match is over
+          || ((3 << (nextMove << 1)) & board()) != 0 ? // spot is occupied
+          Piece.NONE : UltimateState.this.currentPiece();
+    }
   }
 }
