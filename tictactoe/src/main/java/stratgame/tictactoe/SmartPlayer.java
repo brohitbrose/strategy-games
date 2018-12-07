@@ -17,7 +17,10 @@ public class SmartPlayer extends NegamaxPlayer<Integer, Piece, TTTState> {
   }
 
   @Override
-  protected View candidate(State<Integer> trueState, Piece p, int alpha, int beta, Integer choice) {
+  protected NegamaxView<Integer, Piece, TTTState> candidate(
+      State<Integer> trueState, Piece p,
+      int alpha, int beta,
+      Integer choice) {
     return new View(trueState, alpha, beta, choice);
   }
 

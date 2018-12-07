@@ -21,7 +21,10 @@ public class SmartPlayer extends NegamaxPlayer<NiyaMove, Color, NiyaState> {
   }
 
   @Override
-  protected View candidate(State<NiyaMove> trueState, Color piece, int alpha, int beta, NiyaMove choice) {
+  protected NegamaxView<NiyaMove, Color, NiyaState> candidate(
+      State<NiyaMove> trueState, Color piece,
+      int alpha, int beta,
+      NiyaMove choice) {
     return new View(trueState, alpha, beta, choice);
   }
 
