@@ -21,7 +21,7 @@ public class KeyboardPlayer implements Player<NiyaMove> {
     NiyaMove decision;
     while (true) {
       try {
-        decision = new NiyaMove(keyboard.nextInt(), keyboard.nextInt());
+        decision = NiyaMove.from(keyboard.nextInt(), keyboard.nextInt());
         break;
       } catch (IllegalArgumentException e) {
         System.out.println("Try again: " + e.getMessage());
