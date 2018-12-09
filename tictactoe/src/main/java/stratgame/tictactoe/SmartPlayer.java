@@ -1,7 +1,6 @@
 package stratgame.tictactoe;
 
 import stratgame.ai.NegamaxPlayer;
-import stratgame.game.State;
 
 /**
  * {@link NegamaxPlayer} for {@code TTTStates}.

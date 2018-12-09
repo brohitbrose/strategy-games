@@ -6,10 +6,26 @@ import stratgame.game.State;
 
 /**
  * {@link Player} that uses a minimax strategy to decide plays.
+ * <p>
+ * Unlike with the {@code Player} interfaces in the {@code stratgame.game}
+ * package, implementers of this class do not (and cannot) override {@link
+ * #decide(State)}, and must instead override {@link #terminalValue(State)}.
+ * This drastically reduces the boilerplate required for custom negamax
+ * implementations in various games.
+ * <p>
+ * An inner class, {@link NegamaxView}, is responsible for the bulk of the
+ * negamax implementation.  It defaults to an unlimited-depth game tree search,
+ * precluding heuristic evaluations of non-terminal nodes.  To modify this
+ * behavior, override this {@code NegamaxView} class, then override {@link
+ * #buildView(State, int, int, Object) buildView} to return an instance of
+ * that subclass.
+ *
+ * @param <M> the type of move that this {@code Player} plays.
+ * @param <P> the type of mark that identifies this {@code Player} in a game.
+ * @param <S> the type of {@code State} to which this {@code Player} submits
+ *           moves.
  */
-public abstract class NegamaxPlayer<M,
-                                    P,
-                                    S extends State<M>>
+public abstract class NegamaxPlayer<M, P, S extends State<M>>
     implements Player<M> {
 
   /**
@@ -17,7 +33,17 @@ public abstract class NegamaxPlayer<M,
    */
   protected P piece;
 
-  public NegamaxPlayer() { }
+  protected NegamaxPlayer() { }
+
+  /**
+   * Constructs a new {@code NegamaxView} that is the result of playing {@code
+   * m} in {@code state}, assuming that {@code state} was bound by {@code alpha}
+   * and {@code beta}, and updates {@code this.alpha} and {@code his.beta}
+   * accordingly.
+   */
+  public NegamaxView buildView(S trueState, int alpha, int beta, M choice) {
+    return new NegamaxView(trueState, alpha, beta, choice);
+  }
 
   /**
    * Returns the {@code NegamaxView} that is the result of placing {@code piece}
@@ -29,11 +55,11 @@ public abstract class NegamaxPlayer<M,
   public final M decide(State<M> trueState) {
     int bestValue = Integer.MIN_VALUE;
     M bestChoice = null;
-    int alpha = -100;
-    int beta = 100;
+    int alpha = -0x7FFFFFFF;
+    int beta = 0x7FFFFFFF;
     final List<M> possible = trueState.validMoves();
     for (M choice : possible) {
-      final NegamaxView updatedState = new NegamaxView((S) trueState, alpha, beta, choice);
+      final NegamaxView updatedState = buildView((S) trueState, alpha, beta, choice);
       final int nv = -updatedState.minimaxValue();
       if (nv > bestValue) {
         bestValue = nv;
@@ -46,19 +72,27 @@ public abstract class NegamaxPlayer<M,
     return bestChoice;
   }
 
+  /**
+   * Returns the negamax value of this state without evaluating any further
+   * subtrees, e.g. by some heuristic or by treating {@code state} as the
+   * endgame.
+   */
   public abstract int terminalValue(S state);
 
-  private class NegamaxView implements Negamaxable<M> {
+  /**
+   * {@code Negamaxable} wrapper around a {@code State}.
+   */
+  public class NegamaxView implements Negamaxable<M> {
 
-    private int alpha;
-    private int beta;
-    private S state;
+    protected int alpha;
+    protected int beta;
+    protected S state;
 
     /**
-     * Constructs a new {@code View} that is the result of playing {@code m} in
-     * {@code state}, assuming that {@code state} was bound by {@code alpha} and
-     * {@code beta}, and updates {@code this.alpha} and {@code this.beta}
-     * accordingly.
+     * Constructs a new {@code NegamaxView} that is the result of playing {@code
+     * m} in {@code state}, assuming that {@code state} was bound by {@code
+     * alpha} and {@code beta}, and updates {@code this.alpha} and {@code
+     * this.beta} accordingly.
      */
     @SuppressWarnings("unchecked")
     NegamaxView(S state, int alpha, int beta, M m) {
@@ -69,8 +103,8 @@ public abstract class NegamaxPlayer<M,
     }
 
     /**
-     * Constructs a new {@code View} that is the result of playing {@code m} in
-     * {@code view}, updating {@code alpha} and {@code beta} accordingly.
+     * Constructs a new {@code NegamaxView} that is the result of playing {@code
+     * m} in {@code view}, updating {@code alpha} and {@code beta} accordingly.
      */
     @SuppressWarnings("unchecked")
     NegamaxView(NegamaxView view, M m) {

@@ -147,9 +147,7 @@ public class NiyaState implements State<NiyaMove> {
     movesMade = s.movesMade;
     winner = s.winner;
     List<NiyaMove> moves = new ArrayList<>(12);
-    for (NiyaMove m: s.validMoves) {
-      moves.add(m);
-    }
+    moves.addAll(s.validMoves);
     validMoves = moves;
   }
 

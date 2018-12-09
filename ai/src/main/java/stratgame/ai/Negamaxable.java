@@ -1,9 +1,8 @@
 package stratgame.ai;
 
-import stratgame.game.State;
-
 /**
- * {@link State} with a computable negamax value.
+ * Mutable state, not necessarily a {@code stratgame.game.State}, with a
+ * computable negamax value.
  */
 public interface Negamaxable<M> extends Minimaxable<M> {
 
@@ -33,6 +32,7 @@ public interface Negamaxable<M> extends Minimaxable<M> {
    * Returns a new {@code Negamaxable} that captures the result of playing
    * {@code m} to {@code this} (but leaves {@code this} untouched).
    */
+  @Override
   Negamaxable<M> cloneAndMove(M m);
 
   /**
@@ -42,8 +42,7 @@ public interface Negamaxable<M> extends Minimaxable<M> {
   int terminalValue();
 
   /**
-   * The negamax value of this {@link State}, with a default alpha-beta pruning
-   * implementation.
+   * The negamax value of this state.
    */
   int negamaxValue(int color);
 

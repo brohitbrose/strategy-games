@@ -15,4 +15,10 @@ public interface Minimaxable<M> {
    * Updates this {@code Minimaxable} by playing {@code move}.
    */
   void move(M move);
+
+  /**
+   * Returns a new {@code Minimaxable} that captures the result of playing
+   * {@code m} to {@code this} (but leaves {@code this} untouched).
+   */
+  Minimaxable<M> cloneAndMove(M m);
 }
