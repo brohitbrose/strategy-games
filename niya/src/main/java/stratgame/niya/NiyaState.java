@@ -128,6 +128,11 @@ public class NiyaState implements State<NiyaMove> {
     this((NiyaState) s);
   }
 
+  @Override
+  public NiyaState clone() {
+    return new NiyaState(this);
+  }
+
   /**
    * Copy constructor.
    */
@@ -142,9 +147,7 @@ public class NiyaState implements State<NiyaMove> {
     movesMade = s.movesMade;
     winner = s.winner;
     List<NiyaMove> moves = new ArrayList<>(12);
-    for (NiyaMove m: s.validMoves) {
-      moves.add(new NiyaMove(m));
-    }
+    moves.addAll(s.validMoves);
     validMoves = moves;
   }
 
@@ -222,6 +225,10 @@ public class NiyaState implements State<NiyaMove> {
     return false;
   }
 
+  public boolean makeMove(int row, int col) {
+    return makeMove(NiyaMove.from(row, col));
+  }
+
   @Override
   public boolean isOver() {
     return winner != Color.NONE || !hasRemaining();
@@ -263,7 +270,7 @@ public class NiyaState implements State<NiyaMove> {
     if (hasRemaining()) {
       for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-          final NiyaMove m = new NiyaMove(i,j);
+          final NiyaMove m = NiyaMove.from(i,j);
           if (validateDecision(m)) {
             validMoves.add(m);
           }

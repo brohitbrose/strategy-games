@@ -3,7 +3,7 @@ package stratgame.game;
 /**
  * Entity responsible for playing moves in a {@link Game}.
  *
- * @param <M> the type of {@code Move} that this {@code Player} plays.
+ * @param <M> the type of move that this {@code Player} plays.
  */
 public interface Player<M> {
 

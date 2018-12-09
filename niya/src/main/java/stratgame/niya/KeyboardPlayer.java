@@ -1,13 +1,14 @@
 package stratgame.niya;
 
 import java.util.Scanner;
+import stratgame.game.Player;
 import stratgame.game.State;
 
 /**
- * Manual {@link NiyaPlayer} that prompts a user to pipe the desired move's row
- * and column into {@code stdin}.
+ * Manual {@link Player} that prompts a user to pipe the desired move's row and
+ * column into {@code stdin}.
  */
-public class KeyboardPlayer implements NiyaPlayer {
+public class KeyboardPlayer implements Player<NiyaMove> {
 
   private final Scanner keyboard;
 
@@ -20,7 +21,7 @@ public class KeyboardPlayer implements NiyaPlayer {
     NiyaMove decision;
     while (true) {
       try {
-        decision = new NiyaMove(keyboard.nextInt(), keyboard.nextInt());
+        decision = NiyaMove.from(keyboard.nextInt(), keyboard.nextInt());
         break;
       } catch (IllegalArgumentException e) {
         System.out.println("Try again: " + e.getMessage());
