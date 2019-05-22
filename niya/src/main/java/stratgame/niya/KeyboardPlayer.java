@@ -8,7 +8,7 @@ import stratgame.game.State;
  * Manual {@link Player} that prompts a user to pipe the desired move's row and
  * column into {@code stdin}.
  */
-public class KeyboardPlayer implements Player<NiyaMove> {
+public class KeyboardPlayer implements Player<NiyaMove, Color> {
 
   private final Scanner keyboard;
 
@@ -17,7 +17,7 @@ public class KeyboardPlayer implements Player<NiyaMove> {
   }
 
   @Override
-  public NiyaMove decide(State<NiyaMove> s) {
+  public NiyaMove decide(State<NiyaMove, Color> s) {
     NiyaMove decision;
     while (true) {
       try {

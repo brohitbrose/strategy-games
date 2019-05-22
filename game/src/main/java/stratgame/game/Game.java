@@ -5,28 +5,28 @@ package stratgame.game;
  *
  * @param <M> the {@code Move} type that can be played in this {@code Game}.
  */
-public interface Game<M> {
+public interface Game<M, P> {
 
   /**
    * The {@code Player} who is expected to move on the current turn.
    */
-  Player<M> current();
+  Player<M, P> current();
 
   /**
    * Context used to manage the state of this {@code Game}.
    */
-  State<M> state();
+  State<M, P> state();
 
   /**
    * Copy of context used to manage the state of this {@code Game}.
    */
-  State<M> snapshot();
+  State<M, P> snapshot();
 
   /**
    * Prompts {@code current()} to make a move.
    */
   default void await() {
-    final State<M> copy = snapshot();
+    final State<M, P> copy = snapshot();
     System.out.println("Possible: " + copy.validMoves());
     playMove(current().decide(copy));
   }

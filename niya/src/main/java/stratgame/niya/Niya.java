@@ -6,17 +6,17 @@ import stratgame.game.Player;
 /**
  * {@link Game} that manages the lifecycle of a Niya match.
  */
-public final class Niya implements Game<NiyaMove> {
+public final class Niya implements Game<NiyaMove, Color> {
 
   /**
    * The {@code Player} that moves on the first and every alternate turn.
    */
-  private final Player<NiyaMove> red;
+  private final Player<NiyaMove, Color> red;
 
   /**
    * The {@code Player} that moves on the second and every alternate turn.
    */
-  private final Player<NiyaMove> black;
+  private final Player<NiyaMove, Color> black;
 
   /**
    * Internal {@link NiyaState}.
@@ -33,7 +33,7 @@ public final class Niya implements Game<NiyaMove> {
    * @throws IllegalArgumentException if {@code initialState.length != 16} or
    * {@code initialState} does not contain every integer from 0 to 15.
    */
-  public Niya(Player<NiyaMove> red, Player<NiyaMove> black, int[] initialState) {
+  public Niya(Player<NiyaMove, Color> red, Player<NiyaMove, Color> black, int[] initialState) {
 
     // Set players
     this.red = red;
@@ -45,7 +45,7 @@ public final class Niya implements Game<NiyaMove> {
   /**
    * Initializes a {@code Niya} instance with a randomized board configuration.
    */
-  public Niya(Player<NiyaMove> red, Player<NiyaMove> black) {
+  public Niya(Player<NiyaMove, Color> red, Player<NiyaMove, Color> black) {
     this(red, black, randomInit());
   }
 
@@ -64,7 +64,7 @@ public final class Niya implements Game<NiyaMove> {
   }
 
   @Override
-  public Player<NiyaMove> current() {
+  public Player<NiyaMove, Color> current() {
     return state.currentColor() == Color.RED ? red : black;
   }
 

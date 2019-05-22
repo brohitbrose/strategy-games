@@ -54,7 +54,7 @@ import stratgame.game.State;
  * as masking {@code cache} against {@code 0000000100100100...100100} and
  * receiving a nonzero result.
  */
-public class NiyaState implements State<NiyaMove> {
+public class NiyaState implements State<NiyaMove, Color> {
 
   private Spot[] board; // match state
   private Spot previous; // (possibly null) Spot selected in previous turn
@@ -63,6 +63,7 @@ public class NiyaState implements State<NiyaMove> {
   private List<NiyaMove> validMoves; // valid moves on current turn
   private long redCache; // accelerates red win determination
   private long blackCache; // accelerates black win determination
+  private long history; // compact history of moves
 
   private static final long[] INCREMENTS = new long[]{
       0x41001001L, 0x240008001L, 0x1200040001L, 0x1008200001L,
@@ -87,6 +88,7 @@ public class NiyaState implements State<NiyaMove> {
    * The winner of the {@code Game} managed by this {@code NiyaState}.  {@code
    * NONE} if either the match is still going or the match ended in a tie.
    */
+  @Override
   public Color winner() { return winner; }
 
   public int movesMade() { return movesMade; }
@@ -101,19 +103,20 @@ public class NiyaState implements State<NiyaMove> {
    * sans color, in {@code initialState}.
    */
   NiyaState(Spot[] initialState) {
-    previous = null;
-    movesMade = 0;
-    winner = Color.NONE;
-    board = new Spot[16];
+    this.previous = null;
+    this.movesMade = 0;
+    this.winner = Color.NONE;
+    this.board = new Spot[16];
     for (int i = 0; i < 16; i++) {
-      board[i] = new Spot(initialState[i]);
-      board[i].color = Color.NONE;
+      this.board[i] = new Spot(initialState[i]);
+      this.board[i].color = Color.NONE;
     }
-    board = initialState;
-    redCache = 0L;
-    blackCache = 0L;
+    this.board = initialState;
+    this.redCache = 0L;
+    this.blackCache = 0L;
+    this.history = 0L;
     // The number of valid moves will never exceed 12
-    validMoves = new ArrayList<>(12);
+    this.validMoves = new ArrayList<>(12);
     updateValidMoves();
   }
 
@@ -124,31 +127,20 @@ public class NiyaState implements State<NiyaMove> {
   /**
    * Copy constructor.
    */
-  public NiyaState(State<NiyaMove> s) {
-    this((NiyaState) s);
-  }
-
-  @Override
-  public NiyaState clone() {
-    return new NiyaState(this);
-  }
-
-  /**
-   * Copy constructor.
-   */
   public NiyaState(NiyaState s) {
-    board = new Spot[s.board.length];
+    this.board = new Spot[s.board.length];
     for (int i = 0; i < board.length; i++) {
-      board[i] = new Spot(s.board[i]);
+      this.board[i] = new Spot(s.board[i]);
     }
-    redCache = s.redCache;
-    blackCache = s.blackCache;
-    previous = s.previous;
-    movesMade = s.movesMade;
-    winner = s.winner;
+    this.redCache = s.redCache;
+    this.blackCache = s.blackCache;
+    this.previous = s.previous;
+    this.movesMade = s.movesMade;
+    this.winner = s.winner;
+    this.history = s.history;
     List<NiyaMove> moves = new ArrayList<>(12);
     moves.addAll(s.validMoves);
-    validMoves = moves;
+    this.validMoves = moves;
   }
 
   private static Spot[] intsToSpots(int[] initialState) {
@@ -205,24 +197,60 @@ public class NiyaState implements State<NiyaMove> {
 
   @Override
   public boolean makeMove(NiyaMove m) {
-    if (validateDecision(m)) {
+    if (!isOver() && validateDecision(m)) {
       final Spot s = getSpot(m);
       s.color = currentColor();
       long cache;
+      final int projection = project(m.row, m.col);
       if (currentColor() == Color.RED) {
-        redCache += INCREMENTS[project(m.row,m.col)];
+        this.redCache += INCREMENTS[projection];
         cache = redCache;
       } else {
-        blackCache += INCREMENTS[project(m.row,m.col)];
+        this.blackCache += INCREMENTS[projection];
         cache = blackCache;
       }
       checkStrictWinner(cache);
-      movesMade++;
-      previous = s;
+      this.history |= (((long) projection) << (this.movesMade << 2));
+      this.movesMade++;
+      this.previous = s;
       updateValidMoves();
       return true;
     }
     return false;
+  }
+
+  @Override
+  public NiyaState clone() {
+    return new NiyaState(this);
+  }
+
+  @Override
+  public NiyaMove undo() {
+    if (this.movesMade != 0) {
+      this.movesMade--;
+      final int d = this.movesMade << 2; // distance: 4, 8, 12, 16, 20, ... , 60
+      final long rm = 15L << d; // result mask
+      final int r = (int) ((rm & this.history) >>> d); // result
+      if (currentColor() == Color.RED) {
+        this.redCache -= INCREMENTS[r];
+      } else {
+        this.blackCache -= INCREMENTS[r];
+      }
+      getSpot(r).color = Color.NONE;
+      this.winner = Color.NONE;
+      this.history &= ((1L << d) - 1);
+      if (this.movesMade == 0) {
+        this.previous = null;
+      } else {
+        final int pd = ((this.movesMade - 1) << 2); // 0, 4, 8, 12, ... , 56
+        final long pm = 15L << pd; // mask to determine previous
+        final int p = (int) ((this.history & pm) >>> pd);
+        this.previous = getSpot(p);
+      }
+      updateValidMoves();
+      return NiyaMove.values()[r];
+    }
+    return null;
   }
 
   public boolean makeMove(int row, int col) {
@@ -231,7 +259,7 @@ public class NiyaState implements State<NiyaMove> {
 
   @Override
   public boolean isOver() {
-    return winner != Color.NONE || !hasRemaining();
+    return this.winner != Color.NONE || !hasRemaining();
   }
 
   /**
@@ -258,7 +286,7 @@ public class NiyaState implements State<NiyaMove> {
   }
 
   private boolean hasRemaining() {
-    return movesMade < 16;
+    return this.movesMade < 16;
   }
 
   /**
@@ -266,18 +294,18 @@ public class NiyaState implements State<NiyaMove> {
    * moves remain but uncolored {@code Spots} do.
    */
   private void updateValidMoves() {
-    validMoves.clear();
+    this.validMoves.clear();
     if (hasRemaining()) {
       for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
           final NiyaMove m = NiyaMove.from(i,j);
           if (validateDecision(m)) {
-            validMoves.add(m);
+            this.validMoves.add(m);
           }
         }
       }
-      if (validMoves.isEmpty()) {
-        winner = otherColor();
+      if (this.validMoves.isEmpty()) {
+        this.winner = otherColor();
       }
     }
   }

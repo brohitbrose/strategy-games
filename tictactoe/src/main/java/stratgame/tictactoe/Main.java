@@ -10,7 +10,7 @@ public class Main {
 //          return keyboard.nextInt();
 //        }
 //      };
-    final TicTacToe ttt = new TicTacToe(new SmartPlayer(Piece.X), new SmartPlayer(Piece.O));
+    TicTacToe ttt = new TicTacToe(new SmartPlayer(Piece.X), new SmartPlayer(Piece.O));
     ttt.start();
     System.out.println(ttt.winner());
   }

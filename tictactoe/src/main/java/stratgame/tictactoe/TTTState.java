@@ -34,13 +34,14 @@ import stratgame.game.State;
  * respectively.  The counts for {@code O} follow identically and are stored in
  * the left 16 bits.
  */
-public class TTTState implements State<Integer> {
+public class TTTState implements State<Integer, Piece> {
 
   private int board; // match state
   private int movesMade; // moves made so far
   private List<Integer> validMoves; // valid moves on current turn
   private Piece winner; // winner as of current turn
   private int cache; // accelerate win determination
+  private long history; // compact history of moves
 
   private static final int[] INCREMENTS = new int[]{
       0b0001000001000001, 0b0000000100000001, 0b0100010000000001,
@@ -60,6 +61,7 @@ public class TTTState implements State<Integer> {
     }
     winner = Piece.NONE;
     this.cache = 0;
+    this.history = 0L;
   }
 
   /**
@@ -72,18 +74,12 @@ public class TTTState implements State<Integer> {
     this.validMoves.addAll(s.validMoves);
     this.winner = s.winner;
     this.cache = s.cache;
+    this.history = s.history;
   }
 
   @Override
   public TTTState clone() {
     return new TTTState(this);
-  }
-
-  /**
-   * Copy constructor.
-   */
-  public TTTState(State<Integer> s) {
-    this((TTTState) s);
   }
 
   @Override
@@ -93,6 +89,9 @@ public class TTTState implements State<Integer> {
 
   @Override
   public List<Integer> validMoves() {
+    if (isOver()) {
+      return new ArrayList<>(0);
+    }
     return validMoves;
   }
 
@@ -105,9 +104,10 @@ public class TTTState implements State<Integer> {
    */
   private boolean moveAndCheck(int cacheCopy, Integer m, int offset, int boardOffset) {
     // make move
-    board |= (1 << ((m << 1) + boardOffset));
-    movesMade++;
-    validMoves.remove(m);
+    this.board |= (1 << ((m << 1) + boardOffset));
+    this.history |= (m.longValue() << (this.movesMade << 2));
+    this.movesMade++;
+    this.validMoves.remove(m);
     // update cache
     cacheCopy += INCREMENTS[m];
     cache = (cacheCopy << offset) | (cache & (0xFFFF << (16 - offset)));
@@ -134,9 +134,9 @@ public class TTTState implements State<Integer> {
     if (p == Piece.NONE) {
       return false;
     }
-    int cacheCopy;
-    int boardOffset;
-    int offset;
+    final int cacheCopy;
+    final int boardOffset;
+    final int offset;
     if (p == Piece.X) {
       offset = 0;
       boardOffset = 1;
@@ -148,19 +148,40 @@ public class TTTState implements State<Integer> {
     }
     if (moveAndCheck(cacheCopy, m, offset, boardOffset)) {
       winner = p;
-      validMoves.clear();
     }
     return true;
   }
 
   @Override
+  public Integer undo() {
+    if (this.movesMade != 0) {
+      this.movesMade--;
+      final int d = this.movesMade << 2; // distance: 4, 8, 12, 16, 20, ... , 32
+      final long rm = 15L << d; // result mask
+      final int r = (int) ((rm & this.history) >>> d); // result
+      this.board &= 0b111111111111111111 - (3 << (r << 1));
+      this.winner = Piece.NONE;
+      if (currentPiece(r) == Piece.X) {
+        this.cache = (this.cache & 0xFFFF0000) | ((this.cache & 0xFFFF) - INCREMENTS[r]);
+      } else {
+        this.cache = (this.cache & 0xFFFF) | (((this.cache >>> 16) - INCREMENTS[r]) << 16);
+      }
+      this.history &= ((1L << d) - 1);
+      this.validMoves.add(r);
+      return r;
+    }
+    return null;
+  }
+
+  @Override
   public boolean isOver() {
-    return validMoves.isEmpty();
+    return this.winner != Piece.NONE || this.movesMade == 9;
   }
 
   /**
    * Returns the winner in this state if one exists, {@code NONE} otherwise.
    */
+  @Override
   public Piece winner() {
     return winner;
   }

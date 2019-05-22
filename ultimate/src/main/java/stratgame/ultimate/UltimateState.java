@@ -19,7 +19,7 @@ import stratgame.tictactoe.TTTState;
  * placed.  We capture this behavior in the {@code Individual} class, and an
  * {@code UltimateState} tracks nine such {@code Individuals}.
  */
-public class UltimateState implements State<Integer> {
+public class UltimateState implements State<Integer, Piece> {
 
   private int board; // match state
   private int movesMade; // moves made so far
@@ -68,12 +68,12 @@ public class UltimateState implements State<Integer> {
   /**
    * Copy constructor.
    */
-  public UltimateState(State<Integer> s) {
+  public UltimateState(State<Integer, Piece> s) {
     this((UltimateState) s);
   }
 
   @Override
-  public State<Integer> clone() {
+  public State<Integer, Piece> clone() {
     return new UltimateState(this);
   }
 
@@ -84,6 +84,11 @@ public class UltimateState implements State<Integer> {
 
   public Piece winner() {
     return winner;
+  }
+
+  @Override
+  public Integer undo() {
+    throw new UnsupportedOperationException("TODO");
   }
 
   @Override
