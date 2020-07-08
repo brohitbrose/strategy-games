@@ -31,4 +31,4 @@ clean : clean-obj
 	rm -f $(TEST)
 
 memcheck : $(TEST)
-	valgrind --leak-check=full $(TEST)
+	$(MEMCHECK) $(TEST)
