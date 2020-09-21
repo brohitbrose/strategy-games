@@ -1,0 +1,28 @@
+plugins {
+  id 'java'
+  id 'application'
+}
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  compile project(':ai')
+  compile project(':game')
+  testCompile 'org.testng:testng:6.10'
+}
+
+test {
+  useTestNG() {
+    scanForTestClasses = false
+    include '**/*Spec.class'
+  }
+  testLogging {
+    events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+    exceptionFormat 'full'
+    displayGranularity = 4
+  }
+}
+
+mainClassName='stratgame.cityplan.Main'
